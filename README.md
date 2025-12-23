@@ -4,6 +4,8 @@ Note: this project is merely a proof of concept and by no means production-ready
 
 A PowerPoint taskpane add-in that renders Typst snippets to SVG via a Rust/WebAssembly engine and inserts them into slides. Each inserted shape carries the original Typst source in its alt text so you can reselect and update it later without losing positioning.
 
+![Screenshot of Typst PowerPoint Add-in](demo.png)
+
 ## How it works
 - `engine/`: Rust crate compiled to WebAssembly with `wasm-bindgen`, wrapping Typst to produce SVG. A bundled math font is initialized at runtime.
 - `web/`: Taskpane UI (`index.html` + `script.js`), manifest, and a simple HTTPS static server for local development. `script.js` compiles Typst, inserts/replaces shapes, and round-trips the Typst source from a shape's `altTextDescription`.
