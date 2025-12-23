@@ -54,7 +54,7 @@ pub fn compile_typst(text: &str) -> String {
     let wrapped = format!(
         r#"
 #set page(
-  margin: 0pt,
+  margin: 3pt,
   background: none,
   width: auto,
   fill: none,

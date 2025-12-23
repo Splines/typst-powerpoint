@@ -1,4 +1,6 @@
-# Typst PowerPoint Add-in
+# PoC: Typst PowerPoint Add-in
+
+Note: this project is merely a proof of concept and by no means production-ready. It was built (50% vibe-coded) on two evenings for fun and learning.
 
 A PowerPoint taskpane add-in that renders Typst snippets to SVG via a Rust/WebAssembly engine and inserts them into slides. Each inserted shape carries the original Typst source in its alt text so you can reselect and update it later without losing positioning.
 
@@ -7,8 +9,8 @@ A PowerPoint taskpane add-in that renders Typst snippets to SVG via a Rust/WebAs
 - `web/`: Taskpane UI (`index.html` + `script.js`), manifest, and a simple HTTPS static server for local development. `script.js` compiles Typst, inserts/replaces shapes, and round-trips the Typst source from a shape's `altTextDescription`.
 
 ## Prerequisites
-- PowerPoint with Office JS add-ins enabled.
-- Node.js.
+- PowerPoint
+- Node.js
 - `wasm-pack` installed (`cargo install wasm-pack`).
 - A locally trusted HTTPS certificate for `localhost` (paths default to `web/certs/localhost.{crt,key}`).
 
@@ -37,9 +39,9 @@ npm run dev
 
 ## Sideload into PowerPoint
 1. PowerPoint → File → Options → Trust Center → Trust Center Settings → Trusted Add-in Catalogs.  
-2. Add a Shared Folder catalog pointing to this repo (where `web/manifest.xml` lives) and check “Show in Menu.” (this requires the folder to be shared as a network folder so that the Catalog URL will be something like `\\your-device\path\to\repo\web`)
+2. Add a Shared Folder catalog pointing to this repo (where `web/manifest.xml` lives) and check "Show in Menu." (this requires the folder to be shared as a network folder so that the Catalog URL will be something like `\\your-device\path\to\repo\web`. On Windows, you can share a folder by right-clicking it in File Explorer, selecting "Properties," going to the "Sharing" tab, and clicking "Advanced Sharing..." and "Share this folder". Follow the prompts to share the folder on your network.)
 3. Restart PowerPoint → Home → Add-ins → Advanced → pick the Typst add-in.  
-4. Open the taskpane; wait for “Insert / Update” once WASM loads.
+4. Open the taskpane; wait for "Insert / Update" once WASM loads.
 
 ## Usage
 - Enter Typst code (e.g. `$a^2 + b^2 = c^2$`) and click **Insert / Update** to place an SVG on the current slide.
@@ -53,6 +55,6 @@ npm run dev
 - `npm run stop` — Stop the Office add-in debugger.
 
 ## Tips
-- If insertion silently fails, check the taskpane console for “Insert failed” or “WASM Load Error.”
-- Ensure the built `pkg/typst_ppt_engine.js` and `.wasm` file stay in `web/pkg/`; the stub file must be replaced by the `wasm-pack` output.
-- Keep the math font available at `/assets/math-font.ttf`; missing font can distort rendering.
+- If insertion silently fails, check the taskpane console for "Insert failed" or "WASM Load Error."
+- Ensure the built `pkg/typst_ppt_engine.js` and `.wasm` file stay in `web/pkg/`.
+- Keep the math font available at `/assets/math-font.ttf`.

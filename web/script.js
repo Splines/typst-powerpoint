@@ -22,6 +22,32 @@ const computeSizeFromSvg = (svg, scale = 1.0, fallbackWidth = 300) => {
     }
     return { width: fallbackWidth, height: fallbackWidth * 0.6 };
 };
+const applyHeightToSvg = (svg, targetHeight) => {
+    if (!targetHeight) return { svg, size: computeSizeFromSvg(svg) };
+    try {
+        const parser = new DOMParser();
+        const doc = parser.parseFromString(svg, "image/svg+xml");
+        const el = doc.documentElement;
+        const viewBoxAttr = el.getAttribute("viewBox");
+        if (!viewBoxAttr) {
+            return { svg, size: computeSizeFromSvg(svg) };
+        }
+        const parts = viewBoxAttr.trim().split(/\s+/).map(Number);
+        if (parts.length !== 4 || parts[2] <= 0 || parts[3] <= 0) {
+            return { svg, size: computeSizeFromSvg(svg) };
+        }
+        const aspect = parts[2] / parts[3];
+        const h = targetHeight;
+        const w = h * aspect;
+        el.setAttribute("height", `${h}`);
+        el.setAttribute("width", `${w}`);
+        const serialized = new XMLSerializer().serializeToString(el);
+        return { svg: serialized, size: { width: w, height: h } };
+    } catch (e) {
+        debug("applyHeightToSvg failed", e);
+        return { svg, size: computeSizeFromSvg(svg) };
+    }
+};
 
 let isWasmReady = false;
 let lastTypstSelection = null; // { slideId, shapeId, left, top, width, height }
@@ -99,7 +125,6 @@ async function handleAction() {
 
             let targetLeft = null;
             let targetTop = null;
-            let targetWidth = null;
             let targetHeight = null;
             let replacing = false;
 
@@ -129,7 +154,6 @@ async function handleAction() {
             if (typstShape) {
                 targetLeft = typstShape.left;
                 targetTop = typstShape.top;
-                targetWidth = typstShape.width;
                 targetHeight = typstShape.height;
                 typstShape.delete();
                 replacing = true;
@@ -148,9 +172,14 @@ async function handleAction() {
             const existingIds = new Set(targetSlide.shapes.items.map((s) => s.id));
             debug("Target slide chosen for insertion", targetSlideId);
 
+            // Pre-size the SVG to minimize flicker on insert
+            const sized = applyHeightToSvg(svgOutput, targetHeight);
+            const svgToInsert = sized.svg;
+            const fallbackSize = sized.size;
+
             // Insert via setSelectedDataAsync; after insertion, tag the shape
             Office.context.document.setSelectedDataAsync(
-                svgOutput,
+                svgToInsert,
                 { coercionType: Office.CoercionType.XmlSvg },
                 async (res) => {
                     if (res.status !== Office.AsyncResultStatus.Succeeded) {
@@ -192,9 +221,8 @@ async function handleAction() {
 
                         shapeToTag.altTextDescription = payload;
                         shapeToTag.name = "Typst Equation";
-                        const size = computeSizeFromSvg(svgOutput);
-                        const h = targetHeight ?? size.height;
-                        const aspect = size.height > 0 ? size.width / size.height : 1;
+                        const h = targetHeight ?? fallbackSize.height;
+                        const aspect = fallbackSize.height > 0 ? fallbackSize.width / fallbackSize.height : 1;
                         shapeToTag.height = h;
                         shapeToTag.width = h * aspect;
                         if (targetLeft !== null && targetTop !== null) {
@@ -202,7 +230,7 @@ async function handleAction() {
                             shapeToTag.top = targetTop;
                         }
                         await ctx2.sync();
-                        debug("Inserted/updated shape tagged", { replacing, targetLeft, targetTop, size, shapeId: shapeToTag.id, targetWidth, targetHeight });
+                        debug("Inserted/updated shape tagged", { replacing, targetLeft, targetTop, size: fallbackSize, shapeId: shapeToTag.id, targetHeight });
                         setStatus(replacing ? "Updated Typst SVG." : "Inserted Typst SVG.");
                     });
                 }
