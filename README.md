@@ -9,6 +9,7 @@ A PowerPoint taskpane add-in that renders Typst snippets to SVG via a Rust/WebAs
 ## How it works
 - `engine/`: Rust crate compiled to WebAssembly with `wasm-bindgen`, wrapping Typst to produce SVG. A bundled math font is initialized at runtime.
 - `web/`: Taskpane UI (`index.html` + `script.js`), manifest, and a simple HTTPS static server for local development. `script.js` compiles Typst, inserts/replaces shapes, and round-trips the Typst source from a shape's `altTextDescription`.
+- Remote compiler mode: set `COMPILER_URL` to offload compilation to an HTTP endpoint (e.g., the included `compiler-server.js`), which returns SVG so the add-in can skip local WebAssembly compilation. This is required if you require packages that the WASM build doesn't include.
 
 ## Prerequisites
 - PowerPoint
@@ -35,10 +36,11 @@ mkcert -cert-file web/certs/localhost.crt -key-file web/certs/localhost.key loca
 4) Start the HTTPS dev server (defaults to `https://localhost:3000`):
 ```bash
 npm run dev
-# optional env: PORT=3443 ROOT=/abs/path CERT=/path/to.crt KEY=/path/to.key
-# optional remote compiler offload:
-#   COMPILER_URL=https://your-compiler-endpoint
-#   COMPILER_AUTH=token-for-bearer-auth (optional)
+# optional env:
+#   PORT=3443 ROOT=/abs/path CERT=/path/to.crt KEY=/path/to.key
+#   COMPILER_URL=https://your-compiler-endpoint/compile   # POST { source, format: "svg" }
+#   COMPILER_AUTH=token-for-bearer-auth                    # sent as Authorization: Bearer <token>
+# The taskpane reads /config.json from the dev server; when COMPILER_URL is set, it uses the remote compiler instead of local WASM.
 ```
 5) Point the manifest at your server if you change host/port (`web/manifest.xml` → `SourceLocation`).
 
@@ -49,7 +51,7 @@ This service shells out to the Typst CLI so packages auto-download and compile:
 npm run compiler
 # env: COMPILER_PORT=4000 COMPILER_HOST=0.0.0.0 TYPST_BIN=typst MAX_BODY_BYTES=1000000
 ```
-Then set `COMPILER_URL=http://localhost:4000/compile` before `npm run dev` so the add-in posts to it.
+Then set `COMPILER_URL=http://localhost:4000/compile` before `npm run dev` so the add-in posts to it. You can also host this service remotely and point `COMPILER_URL` and optional `COMPILER_AUTH` at that endpoint to offload compilation without rebuilding the add-in.
 
 ## Sideload into PowerPoint
 1. PowerPoint → File → Options → Trust Center → Trust Center Settings → Trusted Add-in Catalogs.  
@@ -61,7 +63,7 @@ Then set `COMPILER_URL=http://localhost:4000/compile` before `npm run dev` so th
 - Enter Typst code (e.g. `$a^2 + b^2 = c^2$`) and click **Insert / Update** to place an SVG on the current slide.
 - Select an existing Typst-generated shape to automatically reload its source into the textbox, edit, and re-run Insert / Update to replace it in place (position preserved).
 - Shapes are tagged with `altTextDescription` starting `TYPST:` plus the encoded source; math font is served from `web/assets/math-font.ttf` on the same origin.
-- If `COMPILER_URL` is set (see above), the add-in POSTs `{ source, format: "svg" }` to that endpoint and uses the returned `svg` field. Local WASM acts as a fallback only when no remote compiler is configured.
+- Remote compiler: if `COMPILER_URL` is set, the add-in POSTs `{ source, format: "svg" }` (with optional bearer auth) to that endpoint and uses the returned `svg`. Local WASM is used only when `COMPILER_URL` is not configured.
 
 ## NPM scripts
 - `npm run build:engine` — Build the Rust engine to WebAssembly into `web/pkg/`.
