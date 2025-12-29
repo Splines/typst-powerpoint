@@ -10,6 +10,7 @@ A PowerPoint taskpane add-in that renders Typst snippets to SVG via a Rust/WebAs
 - `engine/`: Rust crate compiled to WebAssembly with `wasm-bindgen`, wrapping Typst to produce SVG. A bundled math font is initialized at runtime.
 - `web/`: Taskpane UI (`index.html` + `script.js`), manifest, and a simple HTTPS static server for local development. `script.js` compiles Typst, inserts/replaces shapes, and round-trips the Typst source from a shape's `altTextDescription`.
 - Remote compiler mode: set `COMPILER_URL` to offload compilation to an HTTP endpoint (e.g., the included `compiler-server.js`), which returns SVG so the add-in can skip local WebAssembly compilation. This is required if you require packages that the WASM build doesn't include.
+![Remote compiler enables use of any Typst package](packages.png)
 
 ## Prerequisites
 - PowerPoint
