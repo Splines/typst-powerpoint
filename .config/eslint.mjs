@@ -6,11 +6,17 @@ import stylistic from "@stylistic/eslint-plugin";
 import globals from "globals";
 import { defineConfig } from "eslint/config";
 
+const customGlobals = {
+  PowerPoint: "readonly",
+  Office: "readonly",
+};
+
 export default defineConfig([
     {
         // Globally ignore the following paths
         ignores: [
             "node_modules/",
+            "web/pkg/",
             "tmp/",
         ],
     },
@@ -30,12 +36,13 @@ export default defineConfig([
                 "braceStyle": "1tbs",
             }).rules,
             "@stylistic/quotes": ["error", "double", { avoidEscape: true }],
-            "no-unused-vars": ["warn", { argsIgnorePattern: "^_" }],
+            "no-unused-vars": ["error", { argsIgnorePattern: "^_" }],
         },
         languageOptions: {
             ecmaVersion: 2022,
             sourceType: "module",
             globals: {
+                ...customGlobals,
                 ...globals.browser,
                 ...globals.node,
             },

@@ -63,7 +63,7 @@ function calculateActualBounds(svgElement) {
       width: bbox.width + 2 * padding,
       height: bbox.height + 2 * padding,
     };
-  } catch (error) {
+  } catch {
     return null;
   }
 }

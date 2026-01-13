@@ -35,7 +35,7 @@ export async function loadCompilerConfig() {
       config.url = json.compilerUrl || config.url;
       config.auth = json.compilerAuth || config.auth;
     }
-  } catch (error) {
+  } catch {
     debug("Config file not found, using defaults");
   }
 

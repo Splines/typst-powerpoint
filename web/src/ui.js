@@ -1,5 +1,4 @@
 import { compile } from "./compiler.js";
-import { state } from "./state.js";
 import { applySizeToSvg } from "./utils.js";
 
 /**
@@ -110,7 +109,7 @@ export async function updatePreview() {
       previewElement.innerText = svgOutput;
       previewElement.style.color = "red";
     }
-  } catch (error) {
+  } catch {
     previewElement.innerText = "";
   }
 }
