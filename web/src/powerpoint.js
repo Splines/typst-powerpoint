@@ -1,7 +1,7 @@
-import { encodeSource, decodeSource, applySizeToSvg, debug } from "./utils.js";
+import { encodeSource, decodeSource, applySizeToSvg, applyFillColorToSvg, debug } from "./utils.js";
 import { state, setLastTypstSelection, storeValue } from "./state.js";
 import { compile } from "./compiler.js";
-import { setStatus, getFontSize, getTypstCode, setTypstCode, setFontSize, setButtonText, updatePreview } from "./ui.js";
+import { setStatus, getFontSize, getFillColor, getTypstCode, setTypstCode, setFontSize, setFillColor, setButtonText, updatePreview } from "./ui.js";
 
 /**
  * Finds a Typst shape in the current selection or uses cached selection
@@ -45,14 +45,16 @@ async function findTypstShape(selectedShapes, allSlides, context) {
  * @param {Object} shape - PowerPoint shape object
  * @param {string} payload - Encoded Typst source
  * @param {string} fontSize - Font size value
+ * @param {string} fillColor - Fill color value
  * @param {Object} position - Position with left and top properties
  * @param {Object} size - Size with width and height properties
  * @param {Object} context - PowerPoint context
  */
-async function tagShape(shape, payload, fontSize, position, size, context) {
+async function tagShape(shape, payload, fontSize, fillColor, position, size, context) {
   shape.altTextDescription = payload;
   shape.name = "Typst Equation";
   shape.tags.add("TypstFontSize", fontSize.toString());
+  shape.tags.add("TypstFillColor", fillColor);
 
   if (size.height > 0 && size.width > 0) {
     shape.height = size.height;
@@ -105,8 +107,10 @@ async function findInsertedShape(slideId, existingShapeIds, context) {
 export async function insertOrUpdateFormula() {
   const rawCode = getTypstCode();
   const fontSize = getFontSize();
+  const fillColor = getFillColor();
 
   storeValue("typstFontSize", fontSize);
+  storeValue("typstFillColor", fillColor);
 
   const fullCode = `#set text(size: ${fontSize}pt)\n${rawCode}`;
 
@@ -167,7 +171,8 @@ export async function insertOrUpdateFormula() {
 
       debug("Target slide chosen for insertion", slideId);
 
-      const { svg: preparedSvg, size } = applySizeToSvg(svgOutput, null);
+      const { svg: sizedSvg, size } = applySizeToSvg(svgOutput, null);
+      const preparedSvg = applyFillColorToSvg(sizedSvg, fillColor);
 
       Office.context.document.setSelectedDataAsync(
         preparedSvg,
@@ -188,7 +193,7 @@ export async function insertOrUpdateFormula() {
               return;
             }
 
-            await tagShape(shapeToTag, payload, fontSize, position, size, ctx2);
+            await tagShape(shapeToTag, payload, fontSize, fillColor, position, size, ctx2);
 
             debug("Inserted/updated shape tagged", {
               isReplacing,
@@ -222,6 +227,25 @@ async function readFontSizeTag(shape, context) {
     return tag.isNullObject ? null : tag.value;
   } catch (error) {
     debug("Error reading tags", error);
+    return null;
+  }
+}
+
+/**
+ * Reads the fill color tag from a shape
+ * @param {Object} shape - PowerPoint shape object
+ * @param {Object} context - PowerPoint context
+ * @returns {Promise<string|null>} Fill color value or null
+ */
+async function readFillColorTag(shape, context) {
+  try {
+    const tag = shape.tags.getItemOrNullObject("TypstFillColor");
+    tag.load("value");
+    await context.sync();
+
+    return tag.isNullObject ? null : tag.value;
+  } catch (error) {
+    debug("Error reading fill color tag", error);
     return null;
   }
 }
@@ -261,8 +285,10 @@ export async function handleSelectionChange() {
         try {
           const decodedCode = decodeSource(base64Payload);
           const storedFontSize = await readFontSizeTag(typstShape, context);
+          const storedFillColor = await readFillColorTag(typstShape, context);
 
           setFontSize(storedFontSize || "20");
+          setFillColor(storedFillColor || "#000000");
           setTypstCode(decodedCode);
 
           debug("Loaded Typst payload from selection");

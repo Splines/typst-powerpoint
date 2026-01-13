@@ -69,6 +69,31 @@ function calculateActualBounds(svgElement) {
 }
 
 /**
+ * Applies fill color to all elements in an SVG string
+ * @param {string} svg - SVG content as string
+ * @param {string} fillColor - The fill color to apply
+ * @returns {string} Modified SVG with fill color applied
+ */
+export function applyFillColorToSvg(svg, fillColor) {
+  try {
+    const parser = new DOMParser();
+    const doc = parser.parseFromString(svg, "image/svg+xml");
+    const svgElement = doc.documentElement;
+
+    const fillableElements = svgElement.querySelectorAll("path, circle, rect, ellipse, polygon, polyline, text");
+    fillableElements.forEach((el) => {
+      el.setAttribute("fill", fillColor);
+    });
+
+    const serializer = new XMLSerializer();
+    return serializer.serializeToString(svgElement);
+  } catch (error) {
+    debug("applyFillColorToSvg failed", error);
+    return svg;
+  }
+}
+
+/**
  * Applies explicit width and height attributes to an SVG element
  * @param {string} svg - SVG content as string
  * @param {number|null} targetHeight - Desired height, or null to use natural size

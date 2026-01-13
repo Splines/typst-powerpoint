@@ -1,7 +1,7 @@
 import init, { compile_typst, init_fonts } from "../pkg/typst_ppt_engine.js";
 import { setCompilerConfig, getStoredValue } from "./state.js";
 import { loadCompilerConfig, setupWasm, setWasmFunctions } from "./compiler.js";
-import { setStatus, setButtonEnabled, setFontSize, setupPreviewListeners, updatePreview } from "./ui.js";
+import { setStatus, setButtonEnabled, setFontSize, setFillColor, setupPreviewListeners, updatePreview, initializeDarkMode, setupDarkModeToggle } from "./ui.js";
 import { insertOrUpdateFormula, handleSelectionChange } from "./powerpoint.js";
 import { debug } from "./utils.js";
 
@@ -21,6 +21,11 @@ async function initializeConfig() {
   const savedFontSize = getStoredValue("typstFontSize");
   if (savedFontSize) {
     setFontSize(savedFontSize);
+  }
+
+  const savedFillColor = getStoredValue("typstFillColor");
+  if (savedFillColor) {
+    setFillColor(savedFillColor);
   }
 }
 
@@ -69,6 +74,9 @@ Office.onReady(async (info) => {
   if (info.host !== Office.HostType.PowerPoint) {
     return;
   }
+
+  initializeDarkMode();
+  setupDarkModeToggle();
 
   await initializeConfig();
   await initializeWasm();

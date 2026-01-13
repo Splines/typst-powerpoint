@@ -34,6 +34,25 @@ export function setFontSize(fontSize) {
 }
 
 /**
+ * Gets the current fill color from the UI
+ * @returns {string} Fill color value
+ */
+export function getFillColor() {
+  return document.getElementById("fillColor").value || "#000000";
+}
+
+/**
+ * Sets the fill color in the UI
+ * @param {string} color - Fill color to set
+ */
+export function setFillColor(color) {
+  const fillColorInput = document.getElementById("fillColor");
+  if (fillColorInput) {
+    fillColorInput.value = color;
+  }
+}
+
+/**
  * Gets the Typst code from the UI input
  * @returns {string} Typst source code
  */
@@ -104,6 +123,11 @@ export async function updatePreview() {
         svgElement.style.width = "100%";
         svgElement.style.height = "auto";
         svgElement.style.maxHeight = "150px";
+
+        // Apply white or black fill for preview based on dark mode
+        const isDarkMode = !document.documentElement.classList.contains("light-mode");
+        const previewFill = isDarkMode ? "#ffffff" : "#000000";
+        applyFillToSvgElement(svgElement, previewFill);
       }
     } else if (svgOutput && svgOutput.startsWith("Error:")) {
       previewElement.innerText = svgOutput;
@@ -114,6 +138,19 @@ export async function updatePreview() {
   }
 }
 
+/**
+ * Applies fill color to SVG element
+ * @param {SVGElement} svgElement - The SVG element to modify
+ * @param {string} fillColor - The fill color to apply
+ */
+function applyFillToSvgElement(svgElement, fillColor) {
+  // Apply fill to all path, circle, rect, ellipse, polygon, and polyline elements
+  const fillableElements = svgElement.querySelectorAll("path, circle, rect, ellipse, polygon, polyline, text");
+  fillableElements.forEach((el) => {
+    el.setAttribute("fill", fillColor);
+  });
+}
+
 let debounceTimer;
 
 /**
@@ -122,6 +159,7 @@ let debounceTimer;
 export function setupPreviewListeners() {
   const typstInput = document.getElementById("typstInput");
   const fontSizeInput = document.getElementById("fontSize");
+  const fillColorInput = document.getElementById("fillColor");
 
   const debouncedUpdate = () => {
     clearTimeout(debounceTimer);
@@ -134,5 +172,54 @@ export function setupPreviewListeners() {
 
   if (fontSizeInput) {
     fontSizeInput.addEventListener("input", debouncedUpdate);
+  }
+
+  if (fillColorInput) {
+    fillColorInput.addEventListener("input", debouncedUpdate);
+  }
+}
+
+/**
+ * Initializes dark mode based on stored preference (defaults to dark mode)
+ */
+export function initializeDarkMode() {
+  const savedTheme = localStorage.getItem("typstTheme");
+  const darkModeToggle = document.getElementById("darkModeToggle");
+
+  // Default to dark mode if no preference is saved
+  const isDarkMode = savedTheme === null ? true : savedTheme === "dark";
+
+  if (darkModeToggle) {
+    darkModeToggle.checked = isDarkMode;
+    applyTheme(isDarkMode);
+  }
+}
+
+/**
+ * Applies the theme to the document
+ * @param {boolean} isDark - Whether to apply dark theme
+ */
+function applyTheme(isDark) {
+  const root = document.documentElement;
+  if (isDark) {
+    root.classList.remove("light-mode");
+  } else {
+    root.classList.add("light-mode");
+  }
+}
+
+/**
+ * Sets up the dark mode toggle listener
+ */
+export function setupDarkModeToggle() {
+  const darkModeToggle = document.getElementById("darkModeToggle");
+
+  if (darkModeToggle) {
+    darkModeToggle.addEventListener("change", (event) => {
+      const isDark = event.target.checked;
+      applyTheme(isDark);
+      localStorage.setItem("typstTheme", isDark ? "dark" : "light");
+      updatePreview();
+    });
   }
 }
