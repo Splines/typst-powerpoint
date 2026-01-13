@@ -1,7 +1,7 @@
 import init, { compile_typst, init_fonts } from "../pkg/typst_ppt_engine.js";
 import { setCompilerConfig, getStoredValue } from "./state.js";
 import { loadCompilerConfig, setupWasm, setWasmFunctions } from "./compiler.js";
-import { setStatus, setButtonEnabled, setFontSize, setupPreviewListeners, updatePreview } from "./ui.js";
+import { setStatus, setButtonEnabled, setFontSize, setupPreviewListeners, updatePreview, initializeDarkMode, setupDarkModeToggle } from "./ui.js";
 import { insertOrUpdateFormula, handleSelectionChange } from "./powerpoint.js";
 import { debug } from "./utils.js";
 
@@ -70,6 +70,9 @@ Office.onReady(async (info) => {
     return;
   }
 
+  initializeDarkMode();
+  setupDarkModeToggle();
+  
   await initializeConfig();
   await initializeWasm();
   setupEventListeners();

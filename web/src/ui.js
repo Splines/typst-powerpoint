@@ -136,3 +136,47 @@ export function setupPreviewListeners() {
     fontSizeInput.addEventListener("input", debouncedUpdate);
   }
 }
+
+/**
+ * Initializes dark mode based on stored preference (defaults to dark mode)
+ */
+export function initializeDarkMode() {
+  const savedTheme = localStorage.getItem("typstTheme");
+  const darkModeToggle = document.getElementById("darkModeToggle");
+
+  // Default to dark mode if no preference is saved
+  const isDarkMode = savedTheme === null ? true : savedTheme === "dark";
+
+  if (darkModeToggle) {
+    darkModeToggle.checked = isDarkMode;
+    applyTheme(isDarkMode);
+  }
+}
+
+/**
+ * Applies the theme to the document
+ * @param {boolean} isDark - Whether to apply dark theme
+ */
+function applyTheme(isDark) {
+  const root = document.documentElement;
+  if (isDark) {
+    root.classList.remove("light-mode");
+  } else {
+    root.classList.add("light-mode");
+  }
+}
+
+/**
+ * Sets up the dark mode toggle listener
+ */
+export function setupDarkModeToggle() {
+  const darkModeToggle = document.getElementById("darkModeToggle");
+
+  if (darkModeToggle) {
+    darkModeToggle.addEventListener("change", (event) => {
+      const isDark = event.target.checked;
+      applyTheme(isDark);
+      localStorage.setItem("typstTheme", isDark ? "dark" : "light");
+    });
+  }
+}
