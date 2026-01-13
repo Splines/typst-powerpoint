@@ -1,6 +1,7 @@
 {
   "name": "typst-ppt-addin",
   "version": "1.0.0",
+  "packageManager": "npm@11.6.2",
   "scripts": {
     "build:engine": "cd engine && wasm-pack build --target web --out-dir ../web/pkg",
     "dev": "node web/dev-server.js",
