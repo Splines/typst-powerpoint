@@ -73,13 +73,27 @@ body {
     font-weight: 600;
 }
 
-.controls input {
+.controls label:not(:first-child) {
+    margin-left: 12px;
+}
+
+.controls input[type="number"] {
     width: 60px;
     padding: 4px;
     border: 1px solid var(--border-color);
     border-radius: 4px;
     background: var(--bg-secondary);
     color: var(--text-primary);
+}
+
+.controls input[type="color"] {
+    width: 40px;
+    height: 28px;
+    padding: 2px;
+    border: 1px solid var(--border-color);
+    border-radius: 4px;
+    background: var(--bg-secondary);
+    cursor: pointer;
 }
 
 textarea {

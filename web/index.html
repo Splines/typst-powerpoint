@@ -12,13 +12,15 @@
   <body>
     <div class="theme-toggle">
       <label for="darkModeToggle">
-        <input type="checkbox" id="darkModeToggle" />
+        <input id="darkModeToggle" type="checkbox">
         <span>Dark Mode</span>
       </label>
     </div>
     <div class="controls">
       <label for="fontSize">Font Size (pt):</label>
       <input id="fontSize" type="number" min="1" step="1.0" value="20">
+      <label for="fillColor">Fill Color:</label>
+      <input id="fillColor" type="color" value="#000000">
     </div>
     <textarea id="typstInput" placeholder="Enter Typst code... e.g. $ a^2 + b^2 = c^2 $"></textarea>
 
