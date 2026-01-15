@@ -71,10 +71,15 @@ function calculateActualBounds(svgElement) {
 /**
  * Applies fill color to all elements in an SVG string
  * @param {string} svg - SVG content as string
- * @param {string} fillColor - The fill color to apply
+ * @param {string|null} fillColor - The fill color to apply, or null to skip
  * @returns {string} Modified SVG with fill color applied
  */
 export function applyFillColorToSvg(svg, fillColor) {
+  if (fillColor === null) {
+    // user wants to use no color at all, or the color from Typst code
+    return svg;
+  }
+
   try {
     const parser = new DOMParser();
     const doc = parser.parseFromString(svg, "image/svg+xml");

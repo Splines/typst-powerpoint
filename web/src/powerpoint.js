@@ -45,7 +45,7 @@ async function findTypstShape(selectedShapes, allSlides, context) {
  * @param {Object} shape - PowerPoint shape object
  * @param {string} payload - Encoded Typst source
  * @param {string} fontSize - Font size value
- * @param {string} fillColor - Fill color value
+ * @param {string|null} fillColor - Fill color value or null if disabled
  * @param {Object} position - Position with left and top properties
  * @param {Object} size - Size with width and height properties
  * @param {Object} context - PowerPoint context
@@ -54,7 +54,7 @@ async function tagShape(shape, payload, fontSize, fillColor, position, size, con
   shape.altTextDescription = payload;
   shape.name = "Typst Equation";
   shape.tags.add("TypstFontSize", fontSize.toString());
-  shape.tags.add("TypstFillColor", fillColor);
+  shape.tags.add("TypstFillColor", fillColor === null ? "disabled" : fillColor);
 
   if (size.height > 0 && size.width > 0) {
     shape.height = size.height;
@@ -286,7 +286,7 @@ export async function handleSelectionChange() {
           const storedFillColor = await readFillColorTag(typstShape, context);
 
           setFontSize(storedFontSize || "20");
-          setFillColor(storedFillColor || "#000000");
+          setFillColor((storedFillColor === "disabled" || !storedFillColor) ? null : storedFillColor);
           setTypstCode(decodedCode);
 
           debug("Loaded Typst payload from selection");

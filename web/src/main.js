@@ -14,7 +14,7 @@ async function initialeUiState() {
 
   const savedFillColor = getStoredValue("typstFillColor");
   if (savedFillColor) {
-    setFillColor(savedFillColor);
+    setFillColor(savedFillColor === "disabled" ? null : savedFillColor);
   }
 }
 
