@@ -8,7 +8,6 @@ import tseslint from "typescript-eslint";
 
 const customGlobals = {
   PowerPoint: "readonly",
-  Office: "readonly",
 };
 
 export default tseslint.config(

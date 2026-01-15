@@ -11,11 +11,19 @@ let compiler: typstWeb.TypstCompiler;
 let renderer: typstWeb.TypstRenderer;
 
 /**
+ * Initializes both the Typst compiler and renderer.
+ */
+export async function initTypst() {
+  await initCompiler();
+  await initRenderer();
+}
+
+/**
  * Initializes the Typst compiler.
  *
  * See also https://myriad-dreamin.github.io/typst.ts/cookery/guide/all-in-one.html#label-Initializing%20using%20the%20low-level%20API
  */
-export async function initCompiler() {
+async function initCompiler() {
   compiler = createTypstCompiler();
   await compiler.init({
     // eslint-disable-next-line @typescript-eslint/no-unsafe-return
@@ -35,7 +43,7 @@ export async function initCompiler() {
  *
  * See also https://myriad-dreamin.github.io/typst.ts/cookery/guide/all-in-one.html#label-Initializing%20using%20the%20low-level%20API
  */
-export async function initRenderer() {
+async function initRenderer() {
   renderer = createTypstRenderer();
   await renderer.init({
     // eslint-disable-next-line @typescript-eslint/no-unsafe-return
@@ -50,7 +58,7 @@ export async function initRenderer() {
  * @param fontSize - Font size in points
  * @returns Complete Typst code ready for compilation
  */
-export function buildRawTypstString(rawCode: string, fontSize: string): string {
+function buildRawTypstString(rawCode: string, fontSize: string): string {
   return "#set page(margin: 3pt, background: none, width: auto, fill: none, height: auto)"
     + `\n#set text(size: ${fontSize}pt)\n${rawCode}`;
 }
