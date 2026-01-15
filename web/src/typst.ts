@@ -1,10 +1,14 @@
+import type * as typstWeb from "@myriaddreamin/typst.ts";
 import { createTypstCompiler, createTypstRenderer } from "@myriaddreamin/typst.ts";
 import { disableDefaultFontAssets, loadFonts } from "@myriaddreamin/typst.ts/dist/esm/options.init.mjs";
+
+// @ts-ignore
 import typstCompilerWasm from "@myriaddreamin/typst-ts-web-compiler/pkg/typst_ts_web_compiler_bg.wasm?url";
+// @ts-ignore
 import typstRendererWasm from "@myriaddreamin/typst-ts-renderer/pkg/typst_ts_renderer_bg.wasm?url";
 
-let compiler;
-let renderer;
+let compiler: typstWeb.TypstCompiler;
+let renderer: typstWeb.TypstRenderer;
 
 /**
  * Initializes the Typst compiler.
@@ -65,7 +69,7 @@ export async function typst(source, fontSize) {
     throw new Error("Compilation failed");
   }
 
-  const artifactContent = new Uint8Array(response["result"]);
+  const artifactContent = response["result"] as Uint8Array<ArrayBuffer>;
   const svg = await renderer.renderSvg({
     format: "vector",
     artifactContent: artifactContent,
