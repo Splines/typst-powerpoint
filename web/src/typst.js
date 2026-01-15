@@ -39,11 +39,23 @@ export async function initRenderer() {
 }
 
 /**
+ * Builds the complete Typst code with page setup and font size
+ * @param {string} rawCode - The user's Typst code
+ * @param {string} fontSize - Font size in points
+ * @returns {string} Complete Typst code ready for compilation
+ */
+export function buildRawTypstString(rawCode, fontSize) {
+  return "#set page(margin: 3pt, background: none, width: auto, fill: none, height: auto)"
+    + `\n#set text(size: ${fontSize}pt)\n${rawCode}`;
+}
+
+/**
  * Compiles the given Typst source to SVG.
  */
-export async function compile(source) {
+export async function typst(source, fontSize) {
   const mainFilePath = "/main.typ";
-  compiler.addSource(mainFilePath, source);
+  const typstCode = buildRawTypstString(source, fontSize);
+  compiler.addSource(mainFilePath, typstCode);
   const response = await compiler.compile({ mainFilePath });
 
   if (!Object.prototype.hasOwnProperty.call(response, "result")) {

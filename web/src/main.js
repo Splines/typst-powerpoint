@@ -1,7 +1,7 @@
 import { getStoredValue } from "./state.js";
 import { setFontSize, setFillColor, setupPreviewListeners, initializeDarkMode, setupDarkModeToggle } from "./ui.js";
 import { insertOrUpdateFormula, handleSelectionChange } from "./powerpoint.js";
-import { initCompiler, initRenderer } from "./compiler.js";
+import { initCompiler, initRenderer } from "./typst.js";
 
 /**
  * Initializes the UI state.

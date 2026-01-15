@@ -1,5 +1,5 @@
-import { compile } from "./compiler.js";
-import { applySizeToSvg, buildTypstCode } from "./utils.js";
+import { typst } from "./typst.js";
+import { applySizeToSvg } from "./utils.js";
 import { storeValue } from "./state.js";
 
 /**
@@ -109,10 +109,8 @@ export async function updatePreview() {
     return;
   }
 
-  const fullCode = buildTypstCode(rawCode, fontSize);
-
   try {
-    const svgOutput = await compile(fullCode);
+    const svgOutput = await typst(rawCode, fontSize);
 
     if (svgOutput && !svgOutput.startsWith("Error:")) {
       const { svg: processedSvg } = applySizeToSvg(svgOutput, null);
