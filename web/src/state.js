@@ -26,7 +26,7 @@ export function getStoredValue(key) {
 /**
  * Stores a value in localStorage
  * @param {string} key - Storage key
- * @param {string} value - Value to store
+ * @param {string|null} value - Value to store
  */
 export function storeValue(key, value) {
   localStorage.setItem(key, value);

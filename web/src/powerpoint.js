@@ -11,7 +11,7 @@ import { setStatus, getFontSize, getFillColor, getTypstCode, setTypstCode, setFo
  * @returns {Promise<Object|null>} Typst shape or null
  */
 async function findTypstShape(selectedShapes, allSlides, context) {
-  let typstShape = selectedShapes.find(
+  const typstShape = selectedShapes.find(
     shape => shape.altTextDescription && shape.altTextDescription.startsWith("TYPST:"),
   );
 
