@@ -36,20 +36,39 @@ export function setFontSize(fontSize) {
 
 /**
  * Gets the current fill color from the UI
- * @returns {string} Fill color value
+ * @returns {string|null} Fill color value or null if disabled
  */
 export function getFillColor() {
+  const enabled = document.getElementById("fillColorEnabled")?.checked;
+  if (!enabled) {
+    return null;
+  }
   return document.getElementById("fillColor").value || "#000000";
 }
 
 /**
  * Sets the fill color in the UI
- * @param {string} color - Fill color to set
+ * @param {string|null} color - Fill color to set, or null to disable
  */
 export function setFillColor(color) {
   const fillColorInput = document.getElementById("fillColor");
-  if (fillColorInput) {
-    fillColorInput.value = color;
+  const fillColorEnabled = document.getElementById("fillColorEnabled");
+
+  if (color === null) {
+    if (fillColorEnabled) {
+      fillColorEnabled.checked = false;
+    }
+    if (fillColorInput) {
+      fillColorInput.disabled = true;
+    }
+  } else {
+    if (fillColorEnabled) {
+      fillColorEnabled.checked = true;
+    }
+    if (fillColorInput) {
+      fillColorInput.value = color;
+      fillColorInput.disabled = false;
+    }
   }
 }
 
@@ -123,10 +142,12 @@ export async function updatePreview() {
         svgElement.style.height = "auto";
         svgElement.style.maxHeight = "150px";
 
-        // Apply white or black fill for preview based on dark mode
-        const isDarkMode = !document.documentElement.classList.contains("light-mode");
-        const previewFill = isDarkMode ? "#ffffff" : "#000000";
-        applyFillToSvgElement(svgElement, previewFill);
+        const fillColor = getFillColor();
+        if (fillColor !== null) {
+          const isDarkMode = !document.documentElement.classList.contains("light-mode");
+          const previewFill = isDarkMode ? "#ffffff" : "#000000";
+          applyFillToSvgElement(svgElement, previewFill);
+        }
       }
     } else if (svgOutput && svgOutput.startsWith("Error:")) {
       previewElement.innerText = svgOutput;
@@ -157,6 +178,7 @@ export function setupPreviewListeners() {
   const typstInput = document.getElementById("typstInput");
   const fontSizeInput = document.getElementById("fontSize");
   const fillColorInput = document.getElementById("fillColor");
+  const fillColorEnabled = document.getElementById("fillColorEnabled");
 
   if (typstInput) {
     typstInput.addEventListener("input", () => {
@@ -176,6 +198,18 @@ export function setupPreviewListeners() {
     fillColorInput.addEventListener("input", () => {
       const fillColor = getFillColor();
       storeValue("typstFillColor", fillColor);
+      updatePreview();
+    });
+  }
+
+  if (fillColorEnabled) {
+    fillColorEnabled.addEventListener("change", () => {
+      const fillColor = getFillColor();
+      const colorInput = document.getElementById("fillColor");
+      if (colorInput) {
+        colorInput.disabled = !fillColorEnabled.checked;
+      }
+      storeValue("typstFillColor", fillColor || "disabled");
       updatePreview();
     });
   }
