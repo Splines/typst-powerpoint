@@ -33,7 +33,8 @@ export function debug(...args) {
  * @returns {string} Complete Typst code ready for compilation
  */
 export function buildTypstCode(rawCode, fontSize) {
-  return `#set page(width: auto, height: auto, margin: 0pt)\n#set text(size: ${fontSize}pt)\n${rawCode}`;
+  return "#set page(margin: 3pt, background: none, width: auto, fill: none, height: auto)"
+    + `\n#set text(size: ${fontSize}pt)\n${rawCode}`;
 }
 
 /**
