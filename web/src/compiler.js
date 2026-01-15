@@ -43,7 +43,7 @@ export async function initRenderer() {
  */
 export async function compile(source) {
   const mainFilePath = "/main.typ";
-  compiler.addSource(mainFilePath, source);
+  compiler.addSource(mainFilePath, "'Hello, typst!'");
   const response = await compiler.compile({ mainFilePath });
 
   // TODO: add proper error handling (for key "diagnostics")
@@ -55,15 +55,20 @@ export async function compile(source) {
   const artifactContent = new Uint8Array(response["result"]);
   console.log(artifactContent);
 
-  const svg = await renderer.renderSvg({
-    format: "vector",
-    artifactContent: artifactContent,
-    data_selection: {
-      body: true,
-      defs: true,
-      css: false,
-      js: false,
-    },
+  // https://github.com/Myriad-Dreamin/typst.ts/blob/3fe6e3caefaab9947689f162c8ea8b193944eef3/packages/typst.ts/src/contrib/snippet.mts#L512-L523
+  const svg = await renderer.runWithSession(async (renderSession) => {
+    renderer.manipulateData({
+      renderSession,
+      action: "reset",
+      data: artifactContent,
+    });
+    return renderer.renderSvg({
+      data_selection: {
+        body: true,
+        defs: true,
+        css: false,
+        js: false,
+      }, renderSession });
   });
 
   console.log(svg);
