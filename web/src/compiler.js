@@ -1,23 +1,26 @@
-import { createTypstCompiler } from "@myriaddreamin/typst.ts/compiler";
-import typstCompilerWasm from "@myriaddreamin/typst-ts-web-compiler/pkg/typst_ts_web_compiler_bg.wasm?url";
+import { $typst } from "@myriaddreamin/typst.ts";
 
-let compiler;
+import typstCompilerWasm from "@myriaddreamin/typst-ts-web-compiler/pkg/typst_ts_web_compiler_bg.wasm?url";
+import typstRendererWasm from "@myriaddreamin/typst-ts-renderer/pkg/typst_ts_renderer_bg.wasm?url";
 
 /**
  * Initializes the Typst compiler.
+ *
+ * https://myriad-dreamin.github.io/typst.ts/cookery/guide/all-in-one.html#label-Initializing%20using%20the%20low-level%20API
  */
 export async function initCompiler() {
-  compiler = createTypstCompiler();
-  await compiler.init({
+  $typst.setCompilerInitOptions({
     getModule: () => {
-      // https://myriad-dreamin.github.io/typst.ts/cookery/guide/all-in-one.html#label-Initializing%20using%20the%20low-level%20API
-      // https://vite.dev/guide/features.html#webassembly
       return typstCompilerWasm;
-
-      // alternative: load from CDN
-      // return "https://cdn.jsdelivr.net/npm/@myriaddreamin/typst-ts-web-compiler/pkg/typst_ts_web_compiler_bg.wasm";
     },
   });
+
+  $typst.setRendererInitOptions({
+    getModule: () => {
+      return typstRendererWasm;
+    },
+  });
+
   console.log("Typst compiler initialized");
 }
 
@@ -28,14 +31,7 @@ export async function initCompiler() {
  * https://myriad-dreamin.github.io/typst.ts/cookery/guide/compiler/bindings.html
  */
 export async function compile(source) {
-  const mainFilePath = "/main.typ";
-  compiler.addSource(mainFilePath, source);
-  const response = await compiler.compile({ mainFilePath, format: "svg" });
-
-  if (!Object.prototype.hasOwnProperty.call(response, "result")) {
-    throw new Error("Compilation failed: no result");
-  }
-
-  const data = response["result"]; // Uint8Array
-  return new TextDecoder().decode(data);
+  const svg = await $typst.svg({ mainContent: source });
+  console.log(svg);
+  return svg;
 }
