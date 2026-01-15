@@ -1,6 +1,6 @@
 import { encodeSource, decodeSource, applySizeToSvg, applyFillColorToSvg, debug } from "./utils.js";
 import { state, setLastTypstSelection, storeValue } from "./state.js";
-import { compile } from "./compiler.js";
+import { typst } from "./typst.js";
 import { setStatus, getFontSize, getFillColor, getTypstCode, setTypstCode, setFontSize, setFillColor, setButtonText, updatePreview } from "./ui.js";
 
 /**
@@ -112,10 +112,8 @@ export async function insertOrUpdateFormula() {
   storeValue("typstFontSize", fontSize);
   storeValue("typstFillColor", fillColor);
 
-  const fullCode = `#set text(size: ${fontSize}pt)\n${rawCode}`;
-
   debug("Handle action start");
-  const svgOutput = await compile(fullCode);
+  const svgOutput = await typst(rawCode, fontSize);
 
   if (typeof svgOutput !== "string" || svgOutput.startsWith("Error:")) {
     setStatus(svgOutput || "Typst compile failed.", true);
