@@ -1,4 +1,5 @@
 import { createTypstCompiler, createTypstRenderer } from "@myriaddreamin/typst.ts";
+import { disableDefaultFontAssets, loadFonts } from "@myriaddreamin/typst.ts/dist/esm/options.init.mjs";
 import typstCompilerWasm from "@myriaddreamin/typst-ts-web-compiler/pkg/typst_ts_web_compiler_bg.wasm?url";
 import typstRendererWasm from "@myriaddreamin/typst-ts-renderer/pkg/typst_ts_renderer_bg.wasm?url";
 
@@ -14,6 +15,12 @@ export async function initCompiler() {
   compiler = createTypstCompiler();
   await compiler.init({
     getModule: () => typstCompilerWasm,
+    beforeBuild: [
+      disableDefaultFontAssets(),
+      loadFonts([
+        "assets/math-font.ttf",
+      ]),
+    ],
   });
   console.log("Typst compiler initialized");
 }
