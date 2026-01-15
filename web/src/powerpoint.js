@@ -112,7 +112,7 @@ export async function insertOrUpdateFormula() {
   storeValue("typstFontSize", fontSize);
   storeValue("typstFillColor", fillColor);
 
-  const fullCode = `#set text(size: ${fontSize}pt)\n${rawCode}`;
+  const fullCode = `#set page(width: auto, height: auto, margin: 0pt)\n#set text(size: ${fontSize}pt)\n${rawCode}`;
 
   debug("Handle action start");
   const svgOutput = await compile(fullCode);
