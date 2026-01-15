@@ -46,6 +46,7 @@ export async function compile(source) {
   compiler.addSource(mainFilePath, source);
   const response = await compiler.compile({ mainFilePath });
 
+  // TODO: add proper error handling (for key "diagnostics")
   if (!Object.prototype.hasOwnProperty.call(response, "result")) {
     throw new Error("Compilation failed: no result");
   }
@@ -57,7 +58,14 @@ export async function compile(source) {
   const svg = await renderer.renderSvg({
     format: "vector",
     artifactContent: artifactContent,
+    data_selection: {
+      body: true,
+      defs: true,
+      css: false,
+      js: false,
+    },
   });
 
+  console.log(svg);
   return svg;
 }
