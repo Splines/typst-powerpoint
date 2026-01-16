@@ -2,7 +2,7 @@ import { typst } from "./typst.js";
 import { storeValue } from "./state.js";
 import { applyFillColor, parseAndApplySize } from "./svg.js";
 import { DOM_IDS, DEFAULTS, BUTTON_TEXT, PREVIEW_CONFIG, STORAGE_KEYS, THEMES, FILL_COLOR_DISABLED } from "./constants.js";
-import { getInputElement, getHTMLElement } from "./utils/dom.js";
+import { getInputElement, getHTMLElement, getAreaElement } from "./utils/dom.js";
 
 /**
  * Sets the status message in the UI.
@@ -62,14 +62,14 @@ export function setFillColor(color: string | null) {
  * @returns Typst source code from the UI input
  */
 export function getTypstCode(): string {
-  return getInputElement(DOM_IDS.TYPST_INPUT).value;
+  return getAreaElement(DOM_IDS.TYPST_INPUT).value;
 }
 
 /**
  * Sets the Typst code in the UI input.
  */
 export function setTypstCode(typstCode: string) {
-  getInputElement(DOM_IDS.TYPST_INPUT).value = typstCode;
+  getAreaElement(DOM_IDS.TYPST_INPUT).value = typstCode;
 }
 
 /**
@@ -130,7 +130,7 @@ export async function updatePreview() {
  * Sets up event listeners for preview updates.
  */
 export function setupPreviewListeners() {
-  const typstInput = getInputElement(DOM_IDS.TYPST_INPUT);
+  const typstInput = getAreaElement(DOM_IDS.TYPST_INPUT);
   const fontSizeInput = getInputElement(DOM_IDS.FONT_SIZE);
   const fillColorInput = getInputElement(DOM_IDS.FILL_COLOR);
   const fillColorEnabled = getInputElement(DOM_IDS.FILL_COLOR_ENABLED);

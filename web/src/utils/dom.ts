@@ -16,10 +16,17 @@ function getElement<T extends HTMLElement>(
   }
   if (!(element instanceof elementType)) {
     throw new Error(
-      `Element with id '${id}' is not of type ${elementType.name}`,
+      `Element with id '${id}' is not of type ${elementType.name}, but ${element.constructor.name}`,
     );
   }
   return element;
+}
+
+/**
+ * Gets an HTMLAreaElement by ID.
+ */
+export function getAreaElement(id: string): HTMLTextAreaElement {
+  return getElement(id, HTMLTextAreaElement);
 }
 
 /**
