@@ -1,9 +1,9 @@
-import { encodeBase64, decodeBase64 } from "./utils/base64.js";
 import { debug } from "./utils/logger.js";
 import { applyFillColor, parseAndApplySize } from "./svg.js";
 import { lastTypstForm, setLastTypstForm, storeValue, TypstForm } from "./state.js";
 import { typst } from "./typst.js";
 import { setStatus, getFontSize, getFillColor, getTypstCode, setTypstCode, setFontSize, setFillColor, setButtonText, updatePreview } from "./ui.js";
+import { isTypstPayload, createTypstPayload, extractTypstCode } from "./payload.js";
 
 /**
  * Finds a Typst shape in the current selection or uses cached selection.
@@ -11,7 +11,7 @@ import { setStatus, getFontSize, getFillColor, getTypstCode, setTypstCode, setFo
 async function findTypstShape(selectedShapes: PowerPoint.Shape[], allSlides: PowerPoint.Slide[],
   context: PowerPoint.RequestContext): Promise<PowerPoint.Shape | undefined> {
   const typstShape = selectedShapes.find(
-    shape => shape.altTextDescription && shape.altTextDescription.startsWith("TYPST:"),
+    shape => isTypstPayload(shape.altTextDescription),
   );
   if (typstShape) return typstShape;
 
@@ -121,7 +121,7 @@ export async function insertOrUpdateFormula() {
     return;
   }
 
-  const payload = `TYPST:${encodeBase64(rawCode)}`;
+  const payload = createTypstPayload(rawCode);
 
   try {
     await PowerPoint.run(async (context) => {
@@ -291,15 +291,14 @@ export async function handleSelectionChange() {
 
     if (shapes.items.length >= 1) {
       const typstShape = shapes.items.find(shape =>
-        shape.altTextDescription && shape.altTextDescription.startsWith("TYPST:"),
+        isTypstPayload(shape.altTextDescription),
       );
 
       if (typstShape && typstShape.altTextDescription) {
         isTypstShape = true;
-        const base64Payload = typstShape.altTextDescription.split("TYPST:")[1];
 
         try {
-          const decodedCode = decodeBase64(base64Payload);
+          const typstCode = extractTypstCode(typstShape.altTextDescription);
           const storedFontSize = await readFontSizeTag(typstShape, context);
           const storedFillColor = await readFillColorTag(typstShape, context);
 
@@ -318,7 +317,7 @@ export async function handleSelectionChange() {
           }
 
           setFillColor(fillColorToSet);
-          setTypstCode(decodedCode);
+          setTypstCode(typstCode);
 
           debug("Loaded Typst payload from selection");
 
