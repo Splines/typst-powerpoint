@@ -123,12 +123,9 @@ export async function updatePreview() {
   svgElement.style.height = "auto";
   svgElement.style.maxHeight = "150px";
 
-  const fillColor = getFillColor();
-  if (fillColor) {
-    const isDarkMode = !document.documentElement.classList.contains("light-mode");
-    const previewFill = isDarkMode ? "#ffffff" : "#000000";
-    applyFillColor(svgElement, previewFill);
-  }
+  const isDarkMode = !document.documentElement.classList.contains("light-mode");
+  const previewFill = isDarkMode ? "#ffffff" : "#000000";
+  applyFillColor(svgElement, previewFill);
 }
 
 /**
