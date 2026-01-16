@@ -1,23 +1,7 @@
-import { getStoredValue } from "./state.js";
-import { setFontSize, setFillColor, setupPreviewListeners, initializeDarkMode, setupDarkModeToggle } from "./ui.js";
+import { setupPreviewListeners, initializeDarkMode, setupDarkModeToggle, initializeUIState } from "./ui.js";
 import { insertOrUpdateFormula, handleSelectionChange } from "./powerpoint.js";
 import { initTypst } from "./typst.js";
-import { STORAGE_KEYS, FILL_COLOR_DISABLED, DOM_IDS } from "./constants.js";
-
-/**
- * Initializes the UI state.
- */
-function initializeUIState() {
-  const savedFontSize = getStoredValue(STORAGE_KEYS.FONT_SIZE);
-  if (savedFontSize) {
-    setFontSize(savedFontSize);
-  }
-
-  const savedFillColor = getStoredValue(STORAGE_KEYS.FILL_COLOR);
-  if (savedFillColor) {
-    setFillColor(savedFillColor === FILL_COLOR_DISABLED ? null : savedFillColor);
-  }
-}
+import { DOM_IDS } from "./constants.js";
 
 /**
  * Sets up event listeners for UI interactions

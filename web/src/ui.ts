@@ -3,6 +3,22 @@ import { storeValue } from "./state.js";
 import { applyFillColor, parseAndApplySize } from "./svg.js";
 import { DOM_IDS, DEFAULTS, BUTTON_TEXT, PREVIEW_CONFIG, STORAGE_KEYS, THEMES, FILL_COLOR_DISABLED } from "./constants.js";
 import { getInputElement, getHTMLElement, getAreaElement } from "./utils/dom.js";
+import { getStoredValue } from "./state.js";
+
+/**
+ * Initializes the UI state.
+ */
+export function initializeUIState() {
+  const savedFontSize = getStoredValue(STORAGE_KEYS.FONT_SIZE);
+  if (savedFontSize) {
+    setFontSize(savedFontSize);
+  }
+
+  const savedFillColor = getStoredValue(STORAGE_KEYS.FILL_COLOR);
+  if (savedFillColor) {
+    setFillColor(savedFillColor === FILL_COLOR_DISABLED ? null : savedFillColor);
+  }
+}
 
 /**
  * Sets the status message in the UI.
