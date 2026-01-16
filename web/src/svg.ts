@@ -47,7 +47,6 @@ export function parseAndApplySize(svg: string):
 
 /**
  * Applies fill color to all elements in an SVG element.
- *
  */
 export function applyFillColor(svg: SVGElement, fillColor: string) {
   const elements = svg.querySelectorAll("*");
