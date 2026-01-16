@@ -2,7 +2,7 @@ import { typst } from "./typst.js";
 import { storeValue } from "./state.js";
 import { applyFillColor, parseAndApplySize } from "./svg.js";
 import { DOM_IDS, DEFAULTS, BUTTON_TEXT, PREVIEW_CONFIG, STORAGE_KEYS, THEMES, FILL_COLOR_DISABLED } from "./constants.js";
-import { getInputElement, getHTMLElement } from "./dom.js";
+import { getInputElement, getHTMLElement } from "./utils/dom.js";
 
 /**
  * Sets the status message in the UI.

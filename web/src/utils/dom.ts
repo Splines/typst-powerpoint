@@ -30,43 +30,8 @@ export function getInputElement(id: string): HTMLInputElement {
 }
 
 /**
- * Gets an HTMLButtonElement by ID.
- */
-export function getButtonElement(id: string): HTMLButtonElement {
-  return getElement(id, HTMLButtonElement);
-}
-
-/**
  * Gets a generic HTMLElement by ID.
  */
 export function getHTMLElement(id: string): HTMLElement {
   return getElement(id, HTMLElement);
-}
-
-/**
- * DOM element cache for performance.
- */
-export class DOMCache {
-  private cache = new Map<string, HTMLElement>();
-
-  /**
-   * Gets an element from cache or DOM.
-   */
-  get<T extends HTMLElement>(id: string, elementType: new () => T): T {
-    const cached = this.cache.get(id);
-    if (cached && cached instanceof elementType) {
-      return cached;
-    }
-
-    const element = getElement(id, elementType);
-    this.cache.set(id, element);
-    return element;
-  }
-
-  /**
-   * Clears the cache.
-   */
-  clear() {
-    this.cache.clear();
-  }
 }
