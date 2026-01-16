@@ -1,6 +1,6 @@
 import { typst } from "./typst.js";
 import { storeValue } from "./state.js";
-import { applyFillColor, applySize } from "./svg.js";
+import { applyFillColor, parseAndApplySize } from "./svg.js";
 
 /**
  * Sets the status message in the UI.
@@ -112,8 +112,8 @@ export async function updatePreview() {
     return;
   }
 
-  const { svg: processedSvg } = applySize(svgOutput);
-  previewElement.innerHTML = processedSvg;
+  const { svgElement: processedSvg } = parseAndApplySize(svgOutput);
+  previewElement.innerHTML = processedSvg.outerHTML;
   previewElement.style.color = "";
 
   const svgElement = previewElement.querySelector("svg");
@@ -123,12 +123,9 @@ export async function updatePreview() {
   svgElement.style.height = "auto";
   svgElement.style.maxHeight = "150px";
 
-  const fillColor = getFillColor();
-  if (fillColor) {
-    const isDarkMode = !document.documentElement.classList.contains("light-mode");
-    const previewFill = isDarkMode ? "#ffffff" : "#000000";
-    applyFillColor(svgElement, previewFill);
-  }
+  const isDarkMode = !document.documentElement.classList.contains("light-mode");
+  const previewFill = isDarkMode ? "#ffffff" : "#000000";
+  applyFillColor(svgElement, previewFill);
 }
 
 /**
