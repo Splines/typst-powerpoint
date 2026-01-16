@@ -1,6 +1,6 @@
 import { typst } from "./typst.js";
-import { applySizeToSvg } from "./utils.js";
 import { storeValue } from "./state.js";
+import { applyFillColor, applySize } from "./svg.js";
 
 /**
  * Sets the status message in the UI.
@@ -112,7 +112,7 @@ export async function updatePreview() {
     return;
   }
 
-  const { svg: processedSvg } = applySizeToSvg(svgOutput, null);
+  const { svg: processedSvg } = applySize(svgOutput);
   previewElement.innerHTML = processedSvg;
   previewElement.style.color = "";
 
@@ -127,18 +127,8 @@ export async function updatePreview() {
   if (fillColor !== null) {
     const isDarkMode = !document.documentElement.classList.contains("light-mode");
     const previewFill = isDarkMode ? "#ffffff" : "#000000";
-    applyFillToSvgElement(svgElement, previewFill);
+    applyFillColor(svgElement, previewFill);
   }
-}
-
-/**
- * Applies fill color to SVG element.
- */
-function applyFillToSvgElement(svg: SVGElement, fillColor: string) {
-  const fillable = svg.querySelectorAll("path, circle, rect, ellipse, polygon, polyline, text");
-  fillable.forEach((el) => {
-    el.setAttribute("fill", fillColor);
-  });
 }
 
 /**
