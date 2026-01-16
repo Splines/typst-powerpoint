@@ -1,4 +1,5 @@
-import { encodeSource, decodeSource, debug } from "./utils.js";
+import { encodeBase64, decodeBase64 } from "./utils/base64.js";
+import { debug } from "./utils/logger.js";
 import { applyFillColor, parseAndApplySize } from "./svg.js";
 import { lastTypstForm, setLastTypstForm, storeValue, TypstForm } from "./state.js";
 import { typst } from "./typst.js";
@@ -120,7 +121,7 @@ export async function insertOrUpdateFormula() {
     return;
   }
 
-  const payload = `TYPST:${encodeSource(rawCode)}`;
+  const payload = `TYPST:${encodeBase64(rawCode)}`;
 
   try {
     await PowerPoint.run(async (context) => {
@@ -298,7 +299,7 @@ export async function handleSelectionChange() {
         const base64Payload = typstShape.altTextDescription.split("TYPST:")[1];
 
         try {
-          const decodedCode = decodeSource(base64Payload);
+          const decodedCode = decodeBase64(base64Payload);
           const storedFontSize = await readFontSizeTag(typstShape, context);
           const storedFillColor = await readFillColorTag(typstShape, context);
 
