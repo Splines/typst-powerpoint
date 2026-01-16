@@ -2,9 +2,10 @@ import { debug } from "./utils/logger.js";
 import { applyFillColor, parseAndApplySize } from "./svg.js";
 import { lastTypstForm, setLastTypstForm, storeValue, TypstForm } from "./state.js";
 import { typst } from "./typst.js";
-import { setStatus, getFontSize, getFillColor, getTypstCode, setTypstCode, setFontSize, setFillColor, setButtonText, updatePreview } from "./ui.js";
+import { setStatus, getFontSize, getFillColor, getTypstCode, setTypstCode, setFontSize, setFillColor, setButtonText } from "./ui.js";
 import { isTypstPayload, createTypstPayload, extractTypstCode } from "./payload.js";
 import { SHAPE_CONFIG, FILL_COLOR_DISABLED, DEFAULTS, STORAGE_KEYS } from "./constants.js";
+import { updatePreview } from "./preview.js";
 
 /**
  * Finds a Typst shape in the current selection or uses cached selection.

@@ -1,6 +1,7 @@
 import { initializeDarkMode, setupDarkModeToggle, initializeUIState, setupEventListeners } from "./ui.js";
 import { handleSelectionChange } from "./powerpoint.js";
 import { initTypst } from "./typst.js";
+import { setupPreviewListeners } from "./preview.js";
 
 /**
  * Main initialization function for Office Add-in.
@@ -17,6 +18,7 @@ await Office.onReady(async (info) => {
 
   initializeUIState();
   setupEventListeners();
+  setupPreviewListeners();
 
   Office.context.document.addHandlerAsync(
     Office.EventType.DocumentSelectionChanged,
