@@ -19,7 +19,7 @@ await Office.onReady(async (info) => {
   setupDarkModeToggle();
 
   initializeUIState();
-  initializeFilePicker();
+  await initializeFilePicker();
   setupEventListeners();
   setupPreviewListeners();
   updateButtonState();

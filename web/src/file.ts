@@ -7,7 +7,104 @@ import { storeValue, getStoredValue } from "./utils/storage.js";
 // Store the file handle for persistent access
 let fileHandle: FileSystemFileHandle | null = null;
 
-// Extend Window interface to include File System Access API
+const DB_NAME = "typst-powerpoint-file-handles";
+const DB_VERSION = 1;
+const STORE_NAME = "fileHandles";
+const FILE_HANDLE_KEY = "lastFileHandle";
+
+/**
+ * Opens the IndexedDB database for storing file handles.
+ */
+async function openDatabase(): Promise<IDBDatabase> {
+  return new Promise((resolve, reject) => {
+    const request = indexedDB.open(DB_NAME, DB_VERSION);
+
+    request.onerror = () => {
+      reject(new Error(request.error?.message || "Failed to open database"));
+    };
+    request.onsuccess = () => {
+      resolve(request.result);
+    };
+
+    request.onupgradeneeded = (event) => {
+      const db = (event.target as IDBOpenDBRequest).result;
+      if (!db.objectStoreNames.contains(STORE_NAME)) {
+        db.createObjectStore(STORE_NAME);
+      }
+    };
+  });
+}
+
+/**
+ * Stores a file handle in IndexedDB.
+ */
+async function storeFileHandle(handle: FileSystemFileHandle): Promise<void> {
+  try {
+    const db = await openDatabase();
+    const transaction = db.transaction(STORE_NAME, "readwrite");
+    const store = transaction.objectStore(STORE_NAME);
+
+    await new Promise<void>((resolve, reject) => {
+      const request = store.put(handle, FILE_HANDLE_KEY);
+      request.onsuccess = () => {
+        resolve();
+      };
+      request.onerror = () => {
+        reject(new Error(request.error?.message || "Failed to store file handle"));
+      };
+    });
+  } catch (error) {
+    console.error("Error storing file handle:", error);
+  }
+}
+
+/**
+ * Retrieves a file handle from IndexedDB.
+ */
+async function retrieveFileHandle(): Promise<FileSystemFileHandle | null> {
+  try {
+    const db = await openDatabase();
+    const transaction = db.transaction(STORE_NAME, "readonly");
+    const store = transaction.objectStore(STORE_NAME);
+
+    const result = await new Promise<FileSystemFileHandle | null>((resolve, reject) => {
+      const request = store.get(FILE_HANDLE_KEY);
+      request.onsuccess = () => {
+        const handle = request.result as FileSystemFileHandle | undefined;
+        resolve(handle ?? null);
+      };
+      request.onerror = () => {
+        reject(new Error(request.error?.message || "Failed to retrieve file handle"));
+      };
+    });
+    return result;
+  } catch (error) {
+    console.error("Error retrieving file handle:", error);
+    return null;
+  }
+}
+
+/**
+ * Verifies that a file handle is still accessible.
+ */
+async function verifyFileHandle(handle: FileSystemFileHandle): Promise<boolean> {
+  try {
+    // Request permission to read the file
+    const permission = await handle.queryPermission({ mode: "read" });
+    if (permission === "granted") {
+      return true;
+    }
+
+    // Try to request permission
+    const requestedPermission = await handle.requestPermission({ mode: "read" });
+    return requestedPermission === "granted";
+  } catch (error) {
+    console.error("Error verifying file handle:", error);
+    return false;
+  }
+}
+
+// Extend Window and FileSystemHandle interfaces to include File System Access API
 declare global {
   interface Window {
     showOpenFilePicker(_options?: {
@@ -17,6 +114,11 @@ declare global {
       }>;
       multiple?: boolean;
     }): Promise<FileSystemFileHandle[]>;
+  }
+
+  interface FileSystemHandle {
+    queryPermission(_descriptor?: { mode: "read" | "readwrite" }): Promise<PermissionState>;
+    requestPermission(_descriptor?: { mode: "read" | "readwrite" }): Promise<PermissionState>;
   }
 }
 
@@ -41,6 +143,8 @@ async function pickFile(): Promise<void> {
     if (handles.length > 0) {
       fileHandle = handles[0];
       const file = await fileHandle.getFile();
+
+      await storeFileHandle(fileHandle);
 
       // Update UI
       const generateBtn = getButtonElement(DOM_IDS.GENERATE_FROM_FILE_BTN);
@@ -158,17 +262,45 @@ export function registerGenerateFromFileCommand() {
 /**
  * Initializes the file picker with the last used file path.
  */
-export function initializeFilePicker() {
+export async function initializeFilePicker() {
   const lastFilePath = getStoredValue(STORAGE_KEYS.LAST_FILE_PATH as string);
   if (!lastFilePath) return;
 
   const filePickerLabel = getHTMLElement(DOM_IDS.FILE_PICKER_LABEL);
   const generateBtn = getButtonElement(DOM_IDS.GENERATE_FROM_FILE_BTN);
 
+  // Try to restore the file handle from IndexedDB
+  const storedHandle = await retrieveFileHandle();
+  if (storedHandle) {
+    // Verify we still have access to the file
+    const hasAccess = await verifyFileHandle(storedHandle);
+    if (hasAccess) {
+      try {
+        // Get the file to verify it still exists and update the name
+        const file = await storedHandle.getFile();
+        fileHandle = storedHandle;
+
+        filePickerLabel.textContent = `Last used: ${file.name}`;
+        filePickerLabel.classList.add("show");
+        filePickerLabel.classList.remove("error-state");
+        generateBtn.style.display = "block";
+
+        // Update stored file name in case it changed
+        storeValue(STORAGE_KEYS.LAST_FILE_PATH as string, file.name);
+        return;
+      } catch (error) {
+        console.error("Error accessing stored file:", error);
+        // File no longer accessible, clear the handle
+        fileHandle = null;
+      }
+    }
+  }
+
+  // If we couldn't restore the file handle, just show the last used name
   filePickerLabel.textContent = `Last used: ${lastFilePath}`;
   filePickerLabel.classList.add("show");
   filePickerLabel.classList.remove("error-state");
 
-  // Show generate button if we have a stored file
-  generateBtn.style.display = "block";
+  // Don't show generate button since we don't have access
+  generateBtn.style.display = "none";
 }
