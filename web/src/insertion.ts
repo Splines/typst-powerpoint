@@ -21,13 +21,13 @@ async function prepareTypstSvg(
   fontSize: string,
   fillColor: string | null,
 ): Promise<PreparedSvgResult | null> {
-  const svgOutput = await typst(typstCode, fontSize);
-
-  if (typeof svgOutput !== "string") {
+  const result = await typst(typstCode, fontSize);
+  if (!result.svg) {
+    // diagnostics are only shown for preview, not insertion
     return null;
   }
 
-  const { svgElement, size } = parseAndApplySize(svgOutput);
+  const { svgElement, size } = parseAndApplySize(result.svg);
   if (fillColor) {
     applyFillColor(svgElement, fillColor);
   }

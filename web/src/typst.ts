@@ -60,7 +60,11 @@ async function initRenderer() {
 }
 
 /**
- * Builds the complete Typst code with page setup and font size
+ * Builds the complete Typst code with page setup and font size.
+ *
+ * Note: If you change the number of lines added here, make sure to update
+ * the diagnostic range offset in preview.ts accordingly.
+ *
  * @param rawCode - The user's Typst code
  * @param fontSize - Font size in points
  * @returns Complete Typst code ready for compilation
@@ -70,20 +74,41 @@ function buildRawTypstString(rawCode: string, fontSize: string): string {
     + `\n#set text(size: ${fontSize}pt)\n${rawCode}`;
 }
 
+export interface CompilationResult {
+  svg: string | null;
+  diagnostics: Diagnostics;
+}
+
+/**
+ * Diagnostic message structure returned by the Typst compiler.
+ *
+ * See https://github.com/Myriad-Dreamin/typst.ts/blob/3fe6e3caefaab9947689f162c8ea8b193944eef3/packages/typst.ts/src/compiler.mts#L24-L43
+ * Unfortunately the interface is not exported directly from the package,
+ * so we redefine it here.
+ */
+export interface DiagnosticMessage {
+  package: string;
+  path: string;
+  severity: string;
+  range: string;
+  message: string;
+}
+
+export type Diagnostics = (string | DiagnosticMessage)[] | undefined;
+
 /**
  * Compiles the given Typst source to SVG.
  */
-export async function typst(source: string, fontSize: string): Promise<string> {
+export async function typst(source: string, fontSize: string): Promise<CompilationResult> {
   const mainFilePath = "/main.typ";
   const typstCode = buildRawTypstString(source, fontSize);
   compiler.addSource(mainFilePath, typstCode);
   const response = await compiler.compile({ mainFilePath });
+  const diagnostics: Diagnostics = response.diagnostics;
 
-  if (!Object.prototype.hasOwnProperty.call(response, "result")) {
-    if (response.diagnostics) {
-      console.error("Compilation diagnostics:", response.diagnostics);
-    }
-    throw new Error("Compilation failed");
+  if (diagnostics && diagnostics.length > 0) {
+    console.warn("Typst compilation diagnostics:", diagnostics);
+    return { svg: null, diagnostics };
   }
 
   const artifactContent = response["result"] as Uint8Array<ArrayBuffer>;
@@ -98,5 +123,5 @@ export async function typst(source: string, fontSize: string): Promise<string> {
     },
   });
 
-  return svg;
+  return { svg, diagnostics };
 }
