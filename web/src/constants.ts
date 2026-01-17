@@ -49,6 +49,8 @@ export const STORAGE_KEYS = {
   FILL_COLOR: "typstFillColor",
   MATH_MODE: "typstMathMode",
   THEME: "typstTheme",
+  LAST_FILE_PATH: "typstLastFilePath",
+  LAST_FILE_HANDLE: "typstLastFileHandle",
 } as const;
 
 /**

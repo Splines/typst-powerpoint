@@ -1,47 +1,91 @@
 import { insertOrUpdateFormula } from "./insertion.js";
 import { setStatus, setTypstCode, getMathModeEnabled, setMathModeEnabled } from "./ui.js";
-import { DOM_IDS } from "./constants.js";
-import { getInputElement, getButtonElement, getHTMLElement } from "./utils/dom.js";
+import { DOM_IDS, STORAGE_KEYS } from "./constants.js";
+import { getButtonElement, getHTMLElement } from "./utils/dom.js";
+import { storeValue, getStoredValue } from "./utils/storage.js";
+
+// Store the file handle for persistent access
+let fileHandle: FileSystemFileHandle | null = null;
+
+// Extend Window interface to include File System Access API
+declare global {
+  interface Window {
+    showOpenFilePicker(_options?: {
+      types?: Array<{
+        description?: string;
+        accept: Record<string, string[]>;
+      }>;
+      multiple?: boolean;
+    }): Promise<FileSystemFileHandle[]>;
+  }
+}
 
 /**
- * Handles file selection form the file picker.
+ * Opens the file picker using File System Access API.
+ */
+async function pickFile(): Promise<void> {
+  try {
+    // Use File System Access API to pick a file
+    const handles = await window.showOpenFilePicker({
+      types: [
+        {
+          description: "Typst files",
+          accept: {
+            "text/plain": [".typ", ".txt"],
+          },
+        },
+      ],
+      multiple: false,
+    });
+
+    if (handles.length > 0) {
+      fileHandle = handles[0];
+      const file = await fileHandle.getFile();
+
+      // Update UI
+      const generateBtn = getButtonElement(DOM_IDS.GENERATE_FROM_FILE_BTN);
+      const filePickerLabel = getHTMLElement(DOM_IDS.FILE_PICKER_LABEL);
+
+      generateBtn.style.display = "block";
+      filePickerLabel.textContent = `Selected: ${file.name}`;
+      filePickerLabel.classList.add("show");
+      filePickerLabel.classList.remove("error-state");
+
+      // Store file name for display
+      storeValue(STORAGE_KEYS.LAST_FILE_PATH as string, file.name);
+    }
+  } catch (error) {
+    // User cancelled or error occurred
+    if ((error as Error).name !== "AbortError") {
+      console.error("Error picking file:", error);
+    }
+  }
+}
+
+/**
+ * Handles file selection from the file picker.
  */
 export function handleFileSelection() {
-  const fileInput = getInputElement(DOM_IDS.FILE_INPUT);
-  const generateBtn = getButtonElement(DOM_IDS.GENERATE_FROM_FILE_BTN);
-  const filePickerLabel = getHTMLElement(DOM_IDS.FILE_PICKER_LABEL);
-
-  fileInput.classList.remove("error-state");
-  filePickerLabel.classList.remove("error-state", "show");
-
-  if (fileInput.files && fileInput.files.length > 0) {
-    generateBtn.style.display = "block";
-  } else {
-    generateBtn.style.display = "none";
-  }
+  // Trigger the File System Access API picker
+  void pickFile();
 }
 
 /**
  * Handles generating formula from the selected file.
  */
 export async function handleGenerateFromFile() {
-  const fileInput = getInputElement(DOM_IDS.FILE_INPUT);
-
-  if (!fileInput.files || fileInput.files.length === 0) {
+  if (!fileHandle) {
     setStatus("Please select a file first", true);
     return;
   }
 
-  const file = fileInput.files[0];
-
   try {
+    // Read the file fresh from disk each time
+    const file = await fileHandle.getFile();
     const content = await file.text();
+
     setTypstCode(content);
     setStatus(`Loaded content from ${file.name}`);
-
-    // Clear the file input for next use
-    fileInput.value = "";
-    getButtonElement(DOM_IDS.GENERATE_FROM_FILE_BTN).style.display = "none";
 
     // Temporarily disable math mode for file generation
     // since external files typically include their own $ delimiters
@@ -57,6 +101,9 @@ export async function handleGenerateFromFile() {
   } catch (error) {
     // eslint-disable-next-line @typescript-eslint/restrict-template-expressions
     setStatus(`Error reading file: ${error}`, true);
+    // Clear the file handle if it's no longer accessible
+    fileHandle = null;
+    getButtonElement(DOM_IDS.GENERATE_FROM_FILE_BTN).style.display = "none";
   }
 }
 
@@ -64,21 +111,18 @@ export async function handleGenerateFromFile() {
  * Shows the file picker error state when no file is selected.
  */
 export function showFilePickerError() {
-  const fileInput = getInputElement(DOM_IDS.FILE_INPUT);
   const filePickerLabel = getHTMLElement(DOM_IDS.FILE_PICKER_LABEL);
 
-  fileInput.classList.add("error-state");
   filePickerLabel.classList.add("error-state", "show");
+  filePickerLabel.textContent = "Select a file";
 }
 
 /**
  * Clears the file picker error state.
  */
 export function clearFilePickerError() {
-  const fileInput = getInputElement(DOM_IDS.FILE_INPUT);
   const filePickerLabel = getHTMLElement(DOM_IDS.FILE_PICKER_LABEL);
 
-  fileInput.classList.remove("error-state");
   filePickerLabel.classList.remove("error-state", "show");
 }
 
@@ -89,9 +133,7 @@ export function clearFilePickerError() {
  */
 export function generateFromFile(event: Office.AddinCommands.Event): void {
   try {
-    const fileInput = getInputElement(DOM_IDS.FILE_INPUT);
-
-    if (!fileInput.files || fileInput.files.length === 0) {
+    if (!fileHandle) {
       void Office.addin.showAsTaskpane();
 
       setTimeout(() => {
@@ -111,4 +153,22 @@ export function generateFromFile(event: Office.AddinCommands.Event): void {
 
 export function registerGenerateFromFileCommand() {
   Office.actions.associate("generateFromFile", generateFromFile);
+}
+
+/**
+ * Initializes the file picker with the last used file path.
+ */
+export function initializeFilePicker() {
+  const lastFilePath = getStoredValue(STORAGE_KEYS.LAST_FILE_PATH as string);
+  if (!lastFilePath) return;
+
+  const filePickerLabel = getHTMLElement(DOM_IDS.FILE_PICKER_LABEL);
+  const generateBtn = getButtonElement(DOM_IDS.GENERATE_FROM_FILE_BTN);
+
+  filePickerLabel.textContent = `Last used: ${lastFilePath}`;
+  filePickerLabel.classList.add("show");
+  filePickerLabel.classList.remove("error-state");
+
+  // Show generate button if we have a stored file
+  generateBtn.style.display = "block";
 }

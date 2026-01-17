@@ -3,7 +3,7 @@ import { initTypst } from "./typst.js";
 import { setupPreviewListeners, updateButtonState } from "./preview.js";
 import { initializeDarkMode, setupDarkModeToggle } from "./theme.js";
 import { handleSelectionChange } from "./selection.js";
-import { registerGenerateFromFileCommand } from "./file.js";
+import { registerGenerateFromFileCommand, initializeFilePicker } from "./file.js";
 
 /**
  * Main initialization function for Office Add-in.
@@ -19,6 +19,7 @@ await Office.onReady(async (info) => {
   setupDarkModeToggle();
 
   initializeUIState();
+  initializeFilePicker();
   setupEventListeners();
   setupPreviewListeners();
   updateButtonState();
