@@ -106,9 +106,7 @@ export default defineConfig([
         language: "css/css",
         extends: [css.configs.recommended],
         rules: {
-            "css/use-baseline": ["error", { 
-                allowSelectors: ["nesting", "resize", "zoom"]
-            }],
+            "css/use-baseline": ["error", { allowSelectors: ["nesting"] }],
         }
     },
 ]);

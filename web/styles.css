@@ -30,6 +30,7 @@ body {
     font-family: sans-serif;
     background: var(--bg-primary);
     color: var(--text-primary);
+    /* eslint-disable-next-line css/use-baseline */
     zoom: 114%;
     transition: background 0.2s, color 0.2s;
 }
@@ -61,18 +62,18 @@ hr {
         background-color: var(--dark);
         border-radius: calc(var(--toggle-width) * 0.25);
         cursor: pointer;
-    }
 
-    input:checked~.slider {
-        background-color: var(--light);
-    }
+        &.checked .slider {
+            background-color: var(--light);
+        }
 
-    input:checked~.slider::before {
-        transform: translateX(calc(var(--toggle-width) * 0.475));
-        background-color: white;
-        box-shadow: none;
-        border: 1px solid lightgray;
-        top: calc(var(--toggle-width) * 0.066 - 1px);
+        &.checked .slider::before {
+            transform: translateX(calc(var(--toggle-width) * 0.475));
+            background-color: white;
+            box-shadow: none;
+            border: 1px solid lightgray;
+            top: calc(var(--toggle-width) * 0.066 - 1px);
+        }
     }
 
     .slider {
@@ -171,6 +172,7 @@ textarea {
     font-weight: bold;
     background: var(--bg-secondary);
     color: var(--text-primary);
+    /* eslint-disable-next-line css/use-baseline */
     resize: vertical;
 }
 
