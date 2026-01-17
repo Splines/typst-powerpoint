@@ -16,6 +16,11 @@ export function initializeUIState() {
   if (savedFillColor) {
     setFillColor(savedFillColor === FILL_COLOR_DISABLED ? null : savedFillColor);
   }
+
+  const savedMathMode = getStoredValue(STORAGE_KEYS.MATH_MODE);
+  if (savedMathMode !== null) {
+    setMathModeEnabled(savedMathMode === "true");
+  }
 }
 
 /**
@@ -134,4 +139,20 @@ export function setButtonEnabled(enabled: boolean) {
 export function setBulkUpdateButtonVisible(visible: boolean) {
   const button = getButtonElement(DOM_IDS.BULK_UPDATE_BTN);
   button.style.display = visible ? "block" : "none";
+}
+
+/**
+ * @returns Whether math mode is enabled
+ */
+export function getMathModeEnabled(): boolean {
+  const checkbox = getInputElement(DOM_IDS.MATH_MODE_ENABLED);
+  return checkbox.checked;
+}
+
+/**
+ * Sets the math mode enabled state in the UI.
+ */
+export function setMathModeEnabled(enabled: boolean) {
+  const checkbox = getInputElement(DOM_IDS.MATH_MODE_ENABLED);
+  checkbox.checked = enabled;
 }

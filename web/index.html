@@ -15,13 +15,19 @@
         <label for="fontSize">Size</label>
         <input id="fontSize" type="number" min="1" step="1.0" value="40">
       </div>
-      <div class="control-group fill-color-group">
+      <div class="control-group checkbox-group fill-color-group">
         <label>
           <input id="fillColorEnabled" type="checkbox" checked>
           <span>Fill</span>
         </label>
         <!-- eslint-disable-next-line @html-eslint/use-baseline -->
         <input id="fillColor" type="color" value="#000000">
+      </div>
+      <div class="control-group checkbox-group">
+        <label>
+          <input id="mathModeEnabled" type="checkbox">
+          <span>Only Math</span>
+        </label>
       </div>
     </div>
     <textarea id="typstInput" placeholder="Enter Typst code, e.g. $ a^2 + b^2 = c^2 $"></textarea>
