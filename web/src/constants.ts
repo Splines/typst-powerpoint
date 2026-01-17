@@ -31,6 +31,8 @@ export const DOM_IDS = {
   BULK_UPDATE_BTN: "bulkUpdateBtn",
   PREVIEW_CONTENT: "previewContent",
   DARK_MODE_TOGGLE: "darkModeToggle",
+  DIAGNOSTICS_CONTAINER: "diagnosticsContainer",
+  DIAGNOSTICS_CONTENT: "diagnosticsContent",
 } as const;
 
 /**

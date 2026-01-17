@@ -1,4 +1,4 @@
-import { typst } from "./typst.js";
+import { DiagnosticMessage, typst } from "./typst.js";
 import { applyFillColor, parseAndApplySize } from "./svg.js";
 import { DOM_IDS, PREVIEW_CONFIG, STORAGE_KEYS, FILL_COLOR_DISABLED } from "./constants.js";
 import { getAreaElement, getHTMLElement, getInputElement } from "./utils/dom";
@@ -47,22 +47,29 @@ export async function updatePreview() {
   const rawCode = getTypstCode().trim();
   const fontSize = getFontSize();
   const previewElement = getHTMLElement(DOM_IDS.PREVIEW_CONTENT);
+  const diagnosticsContainer = getHTMLElement(DOM_IDS.DIAGNOSTICS_CONTAINER);
+  const diagnosticsContent = getHTMLElement(DOM_IDS.DIAGNOSTICS_CONTENT);
 
   if (!rawCode) {
     previewElement.innerHTML = "";
+    diagnosticsContainer.style.display = "none";
     return;
   }
 
-  let svgOutput: string;
-  try {
-    svgOutput = await typst(rawCode, fontSize);
-  } catch {
-    // TODO: better error handling
-    previewElement.innerText = "";
+  const result = await typst(rawCode, fontSize);
+
+  if (result.diagnostics && result.diagnostics.length > 0) {
+    diagnosticsContainer.style.display = "block";
+    displayDiagnostics(result.diagnostics, diagnosticsContent);
+  } else {
+    diagnosticsContainer.style.display = "none";
+  }
+
+  if (!result.svg) {
     return;
   }
 
-  const { svgElement: processedSvg } = parseAndApplySize(svgOutput);
+  const { svgElement: processedSvg } = parseAndApplySize(result.svg);
   previewElement.innerHTML = processedSvg.outerHTML;
   previewElement.style.color = "";
 
@@ -76,6 +83,40 @@ export async function updatePreview() {
   const isDarkMode = document.documentElement.classList.contains("dark-mode");
   const previewFill = isDarkMode ? PREVIEW_CONFIG.DARK_MODE_FILL : PREVIEW_CONFIG.LIGHT_MODE_FILL;
   applyFillColor(svgElement, previewFill);
+}
+
+/**
+ * Displays diagnostics in the UI.
+ */
+function displayDiagnostics(diagnostics: (string | DiagnosticMessage)[], content: HTMLElement) {
+  console.log("Displaying diagnostics:", diagnostics);
+  content.innerHTML = "";
+
+  diagnostics.forEach((diag) => {
+    if (typeof diag === "string") {
+      const diagElement = document.createElement("div");
+      diagElement.className = "diagnostic";
+      diagElement.textContent = diag;
+      content.appendChild(diagElement);
+      return;
+    }
+
+    const diagElement = document.createElement("div");
+    diagElement.className = `diagnostic diagnostic-${diag.severity.toLowerCase()}`;
+
+    const severitySpan = document.createElement("span");
+    severitySpan.className = "diagnostic-severity";
+    severitySpan.textContent = diag.severity;
+
+    const messageSpan = document.createElement("span");
+    messageSpan.className = "diagnostic-message";
+    messageSpan.textContent = diag.message;
+
+    diagElement.appendChild(severitySpan);
+    diagElement.appendChild(messageSpan);
+
+    content.appendChild(diagElement);
+  });
 }
 
 /**
