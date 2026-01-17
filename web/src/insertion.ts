@@ -110,7 +110,7 @@ export async function insertOrUpdateFormula() {
       targetSlide.load(["id", "shapes/items/id"]);
       await context.sync();
 
-      let position: { left: number; top: number } | null = null;
+      let position: { left: number; top: number } | undefined;
       let rotation: number | undefined;
       let isReplacing = false;
 
