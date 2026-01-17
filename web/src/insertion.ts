@@ -41,47 +41,36 @@ async function prepareTypstSvg(
 
 /**
  * Inserts SVG into PowerPoint and tags it with Typst metadata.
+ *
+ * @returns the newly inserted shape or null if insertion fails.
  */
-async function insertAndTagShape(
+async function insertSvgAndTag(
   svg: string,
   info: TypstShapeInfo,
-  onSuccess?: () => void,
-): Promise<boolean> {
-  return new Promise<boolean>((resolve) => {
+  targetSlideId: string,
+  existingShapeIds: Set<string>,
+): Promise<PowerPoint.Shape | null> {
+  return new Promise<PowerPoint.Shape | null>((resolve) => {
     Office.context.document.setSelectedDataAsync(svg, { coercionType: Office.CoercionType.XmlSvg }, (result) => {
       if (result.status !== Office.AsyncResultStatus.Succeeded) {
-        resolve(false);
+        console.error("Insert failed:", result.error);
+        resolve(null);
         return;
       }
 
       void PowerPoint.run(async (context) => {
-        const slides = context.presentation.getSelectedSlides();
-        slides.load("items");
-        await context.sync();
+        const shapeToTag = await findInsertedShape(targetSlideId, existingShapeIds, context);
 
-        const targetSlide = slides.items[0];
-        // eslint-disable-next-line @typescript-eslint/no-unnecessary-condition
-        if (!targetSlide || targetSlide.isNullObject) {
-          resolve(false);
+        if (!shapeToTag) {
+          console.warn("No shape found after insertion; cannot tag Typst payload.");
+          resolve(null);
           return;
         }
 
-        targetSlide.shapes.load("items");
-        await context.sync();
-
-        const newShape = targetSlide.shapes.items[targetSlide.shapes.items.length - 1];
-        // eslint-disable-next-line @typescript-eslint/no-unnecessary-condition
-        if (newShape && !newShape.isNullObject) {
-          await writeShapeProperties(newShape, info, context);
-        }
-
-        if (onSuccess) {
-          onSuccess();
-        }
-        resolve(true);
+        await writeShapeProperties(shapeToTag, info, context);
+        resolve(shapeToTag);
       });
-    },
-    );
+    });
   });
 }
 
@@ -132,44 +121,26 @@ export async function insertOrUpdateFormula() {
         await context.sync();
       }
 
-      createTypstShape(prepared.svg, targetSlide, isReplacing, {
+      const existingShapeIds = new Set(targetSlide.shapes.items.map(shape => shape.id));
+      const insertedShape = await insertSvgAndTag(prepared.svg, {
         payload: prepared.payload,
         fontSize,
         fillColor: fillColor || null,
         position,
         size: prepared.size,
-      });
+      }, targetSlide.id, existingShapeIds);
+
+      if (!insertedShape) {
+        setStatus("Failed to insert SVG into the slide.", true);
+        return;
+      }
+
+      setStatus(isReplacing ? "Updated Typst SVG." : "Inserted Typst SVG.");
     });
   } catch (error) {
     console.error("PowerPoint context error:", error);
     setStatus("PowerPoint API error. See console.", true);
   }
-}
-
-function createTypstShape(svg: string, targetSlide: PowerPoint.Slide,
-  isReplacing: boolean, info: TypstShapeInfo) {
-  Office.context.document.setSelectedDataAsync(svg, { coercionType: Office.CoercionType.XmlSvg }, (result) => {
-    if (result.status !== Office.AsyncResultStatus.Succeeded) {
-      console.error("Insert failed:", result.error);
-      setStatus("Failed to insert SVG into the slide.", true);
-      return;
-    }
-
-    void PowerPoint.run(async (context2) => {
-      const existingShapeIds = new Set(targetSlide.shapes.items.map(shape => shape.id));
-      const shapeToTag = await findInsertedShape(targetSlide.id, existingShapeIds, context2);
-
-      if (!shapeToTag) {
-        console.warn("No shape found after insertion; cannot tag Typst payload.");
-        setStatus("Inserted SVG but could not tag it (no selection).", true);
-        return;
-      }
-
-      await writeShapeProperties(shapeToTag, info, context2);
-      setStatus(isReplacing ? "Updated Typst SVG." : "Inserted Typst SVG.");
-    });
-  },
-  );
 }
 
 /**
@@ -274,18 +245,27 @@ export async function bulkUpdateFontSize() {
           }
 
           const position = calculateCenteredPosition(shape, prepared.size);
+
+          // Capture slide and existing shapes before deletion
+          const parentSlide = shape.getParentSlide();
+          parentSlide.load("id");
+          parentSlide.shapes.load("items/id");
+          await context.sync();
+          const existingShapeIds = new Set(parentSlide.shapes.items.map((s: PowerPoint.Shape) => s.id));
+          const slideId = parentSlide.id;
+
           shape.delete();
           await context.sync();
 
-          const success = await insertAndTagShape(prepared.svg, {
+          const insertedShape = await insertSvgAndTag(prepared.svg, {
             payload: prepared.payload,
             fontSize: newFontSize,
             fillColor,
             position,
             size: prepared.size,
-          });
+          }, slideId, existingShapeIds);
 
-          if (success) {
+          if (insertedShape) {
             successCount++;
           }
         } catch (error) {
