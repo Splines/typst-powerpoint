@@ -63,18 +63,6 @@ hr {
         cursor: pointer;
     }
 
-    input:checked~.slider {
-        background-color: var(--light);
-    }
-
-    input:checked~.slider::before {
-        transform: translateX(calc(var(--toggle-width) * 0.475));
-        background-color: white;
-        box-shadow: none;
-        border: 1px solid lightgray;
-        top: calc(var(--toggle-width) * 0.066 - 1px);
-    }
-
     .slider {
         position: absolute;
         width: 100%;
@@ -95,6 +83,18 @@ hr {
             transition: 0.3s;
         }
     }
+}
+
+input:checked~.slider {
+    background-color: var(--light);
+}
+
+input:checked~.slider::before {
+    transform: translateX(calc(var(--toggle-width) * 0.475));
+    background-color: white;
+    box-shadow: none;
+    border: 1px solid lightgray;
+    top: calc(var(--toggle-width) * 0.066 - 1px);
 }
 
 .controls {
