@@ -110,7 +110,6 @@ export async function insertOrUpdateFormula() {
         setStatus("No slide available to insert SVG.", true);
         return;
       }
-      const slideId = targetSlide.id;
       targetSlide.load(["id", "shapes/items/id"]);
       await context.sync();
 
@@ -139,51 +138,43 @@ export async function insertOrUpdateFormula() {
 
       const serializer = new XMLSerializer();
       const preparedSvg = serializer.serializeToString(svgElement);
-
       const payload = createTypstPayload(rawCode);
-      const info: TypstShapeInfo = {
+      createTypstShape(preparedSvg, targetSlide, isReplacing, {
         payload,
         fontSize,
         fillColor,
         position,
         size,
-      };
-
-      Office.context.document.setSelectedDataAsync(
-        preparedSvg,
-        { coercionType: Office.CoercionType.XmlSvg },
-        (result) => {
-          if (result.status !== Office.AsyncResultStatus.Succeeded) {
-            console.error("Insert failed:", result.error);
-            setStatus("Failed to insert SVG into the slide.", true);
-            return;
-          }
-
-          void PowerPoint.run(async (context2) => {
-            const existingShapeIds = new Set(targetSlide.shapes.items.map(shape => shape.id));
-            const shapeToTag = await findInsertedShape(slideId, existingShapeIds, context2);
-
-            if (!shapeToTag) {
-              console.warn("No shape found after insertion; cannot tag Typst payload.");
-              setStatus("Inserted SVG but could not tag it (no selection).", true);
-              return;
-            }
-
-            await writeShapeProperties(shapeToTag, info, context2);
-
-            debug("Inserted/updated shape tagged", {
-              isReplacing,
-              position,
-              size,
-              shapeId: shapeToTag.id,
-            });
-            setStatus(isReplacing ? "Updated Typst SVG." : "Inserted Typst SVG.");
-          });
-        },
-      );
+      });
     });
   } catch (error) {
     console.error("PowerPoint context error:", error);
     setStatus("PowerPoint API error. See console.", true);
   }
+}
+
+function createTypstShape(svg: string, targetSlide: PowerPoint.Slide,
+  isReplacing: boolean, info: TypstShapeInfo) {
+  Office.context.document.setSelectedDataAsync(svg, { coercionType: Office.CoercionType.XmlSvg }, (result) => {
+    if (result.status !== Office.AsyncResultStatus.Succeeded) {
+      console.error("Insert failed:", result.error);
+      setStatus("Failed to insert SVG into the slide.", true);
+      return;
+    }
+
+    void PowerPoint.run(async (context2) => {
+      const existingShapeIds = new Set(targetSlide.shapes.items.map(shape => shape.id));
+      const shapeToTag = await findInsertedShape(targetSlide.id, existingShapeIds, context2);
+
+      if (!shapeToTag) {
+        console.warn("No shape found after insertion; cannot tag Typst payload.");
+        setStatus("Inserted SVG but could not tag it (no selection).", true);
+        return;
+      }
+
+      await writeShapeProperties(shapeToTag, info, context2);
+      setStatus(isReplacing ? "Updated Typst SVG." : "Inserted Typst SVG.");
+    });
+  },
+  );
 }
