@@ -27,6 +27,7 @@ export const DOM_IDS = {
   FILL_COLOR_ENABLED: "fillColorEnabled",
   FILL_COLOR: "fillColor",
   MATH_MODE_ENABLED: "mathModeEnabled",
+  INPUT_WRAPPER: "inputWrapper",
   TYPST_INPUT: "typstInput",
   INSERT_BTN: "insertBtn",
   BULK_UPDATE_BTN: "bulkUpdateBtn",

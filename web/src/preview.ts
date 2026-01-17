@@ -43,8 +43,25 @@ export function setupPreviewListeners() {
   mathModeEnabled.addEventListener("change", () => {
     const mathMode = getMathModeEnabled();
     storeValue(STORAGE_KEYS.MATH_MODE, mathMode.toString());
+    updateMathModeVisuals();
     void updatePreview();
   });
+
+  updateMathModeVisuals();
+}
+
+/**
+ * Updates the visual state of the input wrapper based on math mode.
+ */
+function updateMathModeVisuals() {
+  const mathMode = getMathModeEnabled();
+  const inputWrapper = getHTMLElement(DOM_IDS.INPUT_WRAPPER);
+
+  if (mathMode) {
+    inputWrapper.classList.remove("math-mode-disabled");
+  } else {
+    inputWrapper.classList.add("math-mode-disabled");
+  }
 }
 
 /**
@@ -157,7 +174,7 @@ export function updateButtonState() {
  * Corrects the diagnostic range to account for added lines in the Typst code.
  *
  * See `buildRawTypstString` for details.
- * 
+ *
  * @param range - The range string from the diagnostic
  * @param mathMode - Whether math mode is enabled (adds extra line)
  */
