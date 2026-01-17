@@ -7,11 +7,9 @@ import { DOM_IDS, STORAGE_KEYS, THEMES } from "./constants.js";
  */
 export function initializeDarkMode() {
   const isDarkMode = isDarkModeEnabled();
-  applyTheme(isDarkMode);
-
   const darkModeToggle = getInputElement(DOM_IDS.DARK_MODE_TOGGLE);
-  updateToggleClass(darkModeToggle);
   darkModeToggle.checked = !isDarkMode;
+  applyTheme(isDarkMode);
 }
 
 /**
@@ -40,26 +38,9 @@ function applyTheme(isDark: boolean) {
 export function setupDarkModeToggle() {
   const darkModeToggle = getInputElement(DOM_IDS.DARK_MODE_TOGGLE);
   darkModeToggle.addEventListener("change", (event) => {
-    const target = event.target as HTMLInputElement;
-    updateToggleClass(target);
-
-    const isDark = !target.checked;
+    const isDark = !(event.target as HTMLInputElement).checked;
     applyTheme(isDark);
     localStorage.setItem(STORAGE_KEYS.THEME, isDark ? THEMES.DARK : THEMES.LIGHT);
     void updatePreview();
   });
-}
-
-/**
- * Updates the label's checked class based on checkbox state.
- */
-function updateToggleClass(checkbox: HTMLInputElement) {
-  const label = checkbox.parentElement;
-  if (!label) return;
-
-  if (checkbox.checked) {
-    label.classList.add("checked");
-  } else {
-    label.classList.remove("checked");
-  }
 }
