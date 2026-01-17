@@ -2,8 +2,9 @@ import { DiagnosticMessage, typst } from "./typst.js";
 import { applyFillColor, parseAndApplySize } from "./svg.js";
 import { DOM_IDS, PREVIEW_CONFIG, STORAGE_KEYS, FILL_COLOR_DISABLED } from "./constants.js";
 import { getAreaElement, getHTMLElement, getInputElement } from "./utils/dom";
-import { getFillColor, getFontSize, getMathModeEnabled, getTypstCode, setButtonEnabled } from "./ui";
-import { storeValue } from "./utils/storage.js";
+import { getFillColor, getFontSize, getMathModeEnabled, getTypstCode, setButtonEnabled, setMathModeEnabled } from "./ui";
+import { storeValue, getStoredValue } from "./utils/storage.js";
+import { lastTypstShapeId } from "./shape.js";
 
 /**
  * Sets up event listeners for preview updates.
@@ -42,7 +43,10 @@ export function setupPreviewListeners() {
 
   mathModeEnabled.addEventListener("change", () => {
     const mathMode = getMathModeEnabled();
-    storeValue(STORAGE_KEYS.MATH_MODE, mathMode.toString());
+    if (!lastTypstShapeId) {
+      // Only save to storage when in insert mode (no shape selected)
+      storeValue(STORAGE_KEYS.MATH_MODE, mathMode.toString());
+    }
     updateMathModeVisuals();
     void updatePreview();
   });
@@ -51,9 +55,20 @@ export function setupPreviewListeners() {
 }
 
 /**
+ * Restores the math mode setting from localStorage.
+ */
+export function restoreMathModeFromStorage() {
+  const savedMathMode = getStoredValue(STORAGE_KEYS.MATH_MODE);
+  if (savedMathMode !== null) {
+    setMathModeEnabled(savedMathMode === "true");
+    updateMathModeVisuals();
+  }
+}
+
+/**
  * Updates the visual state of the input wrapper based on math mode.
  */
-function updateMathModeVisuals() {
+export function updateMathModeVisuals() {
   const mathMode = getMathModeEnabled();
   const inputWrapper = getHTMLElement(DOM_IDS.INPUT_WRAPPER);
   const textarea = getAreaElement(DOM_IDS.TYPST_INPUT);

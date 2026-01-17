@@ -10,6 +10,7 @@ export const SHAPE_CONFIG = {
   TAGS: {
     FONT_SIZE: "TypstFontSize",
     FILL_COLOR: "TypstFillColor",
+    MATH_MODE: "TypstMathMode",
   },
 } as const;
 
