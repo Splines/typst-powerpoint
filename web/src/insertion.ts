@@ -256,11 +256,6 @@ export async function bulkUpdateFontSize() {
         return;
       }
 
-      // typstShapes.forEach(shape =>
-      //   shape.load(["id", "altTextDescription", "left", "top", "width", "height", "tags"]),
-      // );
-      // await context.sync();
-
       let successCount = 0;
 
       for (const shape of typstShapes) {
