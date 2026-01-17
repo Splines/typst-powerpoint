@@ -1,10 +1,11 @@
 import { debug } from "./utils/logger.js";
 import { applyFillColor, parseAndApplySize } from "./svg.js";
 import { typst } from "./typst.js";
-import { setStatus, getFontSize, getFillColor, getTypstCode, lastTypstForm, TypstForm } from "./ui.js";
+import { setStatus, getFontSize, getFillColor, getTypstCode } from "./ui.js";
 import { isTypstPayload, createTypstPayload } from "./payload.js";
-import { SHAPE_CONFIG, FILL_COLOR_DISABLED, STORAGE_KEYS } from "./constants.js";
 import { storeValue } from "./utils/storage.js";
+import { lastTypstForm, tagShape, TypstForm } from "./shape.js";
+import { STORAGE_KEYS } from "./constants.js";
 
 /**
  * Finds a Typst shape in the current selection or uses cached selection.
@@ -37,38 +38,6 @@ async function findTypstShape(selectedShapes: PowerPoint.Shape[], allSlides: Pow
     debug("Fallback to last selection failed:", error);
     return undefined;
   }
-}
-
-/**
- * Tags a shape with Typst metadata.
- *
- * @param shape PowerPoint shape object
- * @param payload Encoded Typst source
- * @param fontSize Font size value
- * @param fillColor Fill color value or null if disabled
- * @param position Position with left and top properties
- * @param size Size with width and height properties
- * @param context PowerPoint (Office) context
- */
-async function tagShape(shape: PowerPoint.Shape, payload: string, fontSize: string,
-  fillColor: string | null, position: { left: number; top: number } | null,
-  size: { width: number; height: number }, context: PowerPoint.RequestContext) {
-  shape.altTextDescription = payload;
-  shape.name = SHAPE_CONFIG.NAME;
-  shape.tags.add(SHAPE_CONFIG.TAGS.FONT_SIZE, fontSize);
-  shape.tags.add(SHAPE_CONFIG.TAGS.FILL_COLOR, fillColor === null ? FILL_COLOR_DISABLED : fillColor);
-
-  if (size.height > 0 && size.width > 0) {
-    shape.height = size.height;
-    shape.width = size.width;
-  }
-
-  if (position) {
-    shape.left = position.left;
-    shape.top = position.top;
-  }
-
-  await context.sync();
 }
 
 /**

@@ -1,7 +1,8 @@
 import { FILL_COLOR_DISABLED, SHAPE_CONFIG, DEFAULTS } from "./constants";
 import { extractTypstCode, isTypstPayload } from "./payload";
 import { updatePreview } from "./preview";
-import { setButtonText, setFillColor, setFontSize, setLastSelectedTypstForm, setStatus, setTypstCode } from "./ui";
+import { readShapeTag, setLastSelectedTypstForm } from "./shape";
+import { setButtonText, setFillColor, setFontSize, setStatus, setTypstCode } from "./ui";
 import { debug } from "./utils/logger";
 
 /**
@@ -79,25 +80,6 @@ async function loadTypstShape(typstShape: PowerPoint.Shape, slideId: string | nu
   } catch (error) {
     console.error("Decode error:", error);
     setStatus("Failed to decode Typst payload from selection.", true);
-  }
-}
-
-/**
- * Reads a tag value from a shape.
- */
-async function readShapeTag(
-  shape: PowerPoint.Shape,
-  tagName: string,
-  context: PowerPoint.RequestContext,
-): Promise<string | null> {
-  try {
-    const tag = shape.tags.getItemOrNullObject(tagName);
-    tag.load("value");
-    await context.sync();
-    return tag.isNullObject ? null : tag.value;
-  } catch (error) {
-    debug(`Error reading tag ${tagName}:`, error);
-    return null;
   }
 }
 
