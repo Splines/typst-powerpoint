@@ -194,8 +194,8 @@ export function updateButtonState() {
  *
  * See `buildRawTypstString` for details.
  *
- * @param range - The range string from the diagnostic
- * @param mathMode - Whether math mode is enabled (adds extra line)
+ * @param range The range string from the diagnostic
+ * @param mathMode Whether math mode is enabled (adds extra line offset)
  */
 function correctDiagnosticRange(range: string, mathMode: boolean): string {
   const rangeRegex = /(\d+):(\d+)-(\d+):(\d+)/;
