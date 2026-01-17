@@ -79,7 +79,7 @@ hr {
         position: absolute;
         width: 100%;
         height: 100%;
-        border-radius: calc(var(--toggle-width) * 0.25);
+        border-radius: calc(var(--toggle-width) * 0.240);
         transition: 0.3s;
 
         &::before {
