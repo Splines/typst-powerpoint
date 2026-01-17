@@ -119,6 +119,8 @@ export async function insertOrUpdateFormula() {
         typstShape.delete();
         isReplacing = true;
         await context.sync();
+      } else {
+        position = await calcShapeTopLeftToBeCentered(prepared.size, context);
       }
 
       const existingShapeIds = new Set(targetSlide.shapes.items.map(shape => shape.id));
@@ -294,4 +296,21 @@ function calculateCenteredPosition(
     left: centerX - newSize.width / 2,
     top: centerY - newSize.height / 2,
   };
+}
+
+/**
+ * Calculates the top-left position for a shape to be centered on the slide.
+ */
+async function calcShapeTopLeftToBeCentered(
+  shapeSize: { width: number; height: number },
+  context: PowerPoint.RequestContext,
+) {
+  const presentation = context.presentation;
+  presentation.load("pageSetup/slideWidth, pageSetup/slideHeight");
+  await context.sync();
+
+  const centerX = (presentation.pageSetup.slideWidth - shapeSize.width) / 2;
+  const centerY = (presentation.pageSetup.slideHeight - shapeSize.height) / 2;
+
+  return { left: centerX, top: centerY };
 }
