@@ -35,8 +35,9 @@ export async function insertOrUpdateFormula() {
       allSlides.load("items");
       await context.sync();
 
-      const targetSlide = selectedSlides.items[0] || allSlides.items[0];
-      if (targetSlide.isNullObject) {
+      const targetSlide: PowerPoint.Slide | undefined = selectedSlides.items[0] || allSlides.items[0];
+      // eslint-disable-next-line @typescript-eslint/no-unnecessary-condition
+      if (!targetSlide || targetSlide.isNullObject) {
         setStatus("No slide available to insert SVG.", true);
         return;
       }
