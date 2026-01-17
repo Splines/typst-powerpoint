@@ -2,6 +2,7 @@ import { DOM_IDS, DEFAULTS, BUTTON_TEXT, STORAGE_KEYS, FILL_COLOR_DISABLED } fro
 import { getInputElement, getHTMLElement, getAreaElement, getButtonElement } from "./utils/dom.js";
 import { insertOrUpdateFormula, bulkUpdateFontSize } from "./insertion.js";
 import { getStoredValue } from "./utils/storage.js";
+import { handleFileSelection, handleGenerateFromFile } from "./file.js";
 
 /**
  * Initializes the UI state.
@@ -167,73 +168,4 @@ export function getMathModeEnabled(): boolean {
 export function setMathModeEnabled(enabled: boolean) {
   const checkbox = getInputElement(DOM_IDS.MATH_MODE_ENABLED);
   checkbox.checked = enabled;
-}
-
-/**
- * Handles file selection form the file picker.
- */
-function handleFileSelection() {
-  const fileInput = getInputElement(DOM_IDS.FILE_INPUT);
-  const generateBtn = getButtonElement(DOM_IDS.GENERATE_FROM_FILE_BTN);
-  const filePickerLabel = getHTMLElement(DOM_IDS.FILE_PICKER_LABEL);
-
-  fileInput.classList.remove("error-state");
-  filePickerLabel.classList.remove("error-state", "show");
-
-  if (fileInput.files && fileInput.files.length > 0) {
-    generateBtn.style.display = "block";
-  } else {
-    generateBtn.style.display = "none";
-  }
-}
-
-/**
- * Handles generating formula from the selected file.
- */
-async function handleGenerateFromFile() {
-  const fileInput = getInputElement(DOM_IDS.FILE_INPUT);
-
-  if (!fileInput.files || fileInput.files.length === 0) {
-    setStatus("Please select a file first", true);
-    return;
-  }
-
-  const file = fileInput.files[0];
-
-  try {
-    const content = await file.text();
-    setTypstCode(content);
-    setStatus(`Loaded content from ${file.name}`);
-
-    // Clear the file input for next use
-    fileInput.value = "";
-    getButtonElement(DOM_IDS.GENERATE_FROM_FILE_BTN).style.display = "none";
-
-    await insertOrUpdateFormula();
-  } catch (error) {
-    // eslint-disable-next-line @typescript-eslint/restrict-template-expressions
-    setStatus(`Error reading file: ${error}`, true);
-  }
-}
-
-/**
- * Shows the file picker error state when no file is selected.
- */
-export function showFilePickerError() {
-  const fileInput = getInputElement(DOM_IDS.FILE_INPUT);
-  const filePickerLabel = getHTMLElement(DOM_IDS.FILE_PICKER_LABEL);
-
-  fileInput.classList.add("error-state");
-  filePickerLabel.classList.add("error-state", "show");
-}
-
-/**
- * Clears the file picker error state.
- */
-export function clearFilePickerError() {
-  const fileInput = getInputElement(DOM_IDS.FILE_INPUT);
-  const filePickerLabel = getHTMLElement(DOM_IDS.FILE_PICKER_LABEL);
-
-  fileInput.classList.remove("error-state");
-  filePickerLabel.classList.remove("error-state", "show");
 }
