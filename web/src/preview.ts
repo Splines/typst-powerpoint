@@ -56,11 +56,14 @@ export function setupPreviewListeners() {
 function updateMathModeVisuals() {
   const mathMode = getMathModeEnabled();
   const inputWrapper = getHTMLElement(DOM_IDS.INPUT_WRAPPER);
+  const textarea = getAreaElement(DOM_IDS.TYPST_INPUT);
 
   if (mathMode) {
     inputWrapper.classList.remove("math-mode-disabled");
+    textarea.placeholder = "Enter Typst code, e.g. a^2 + b^2 = c^2";
   } else {
     inputWrapper.classList.add("math-mode-disabled");
+    textarea.placeholder = "Enter Typst code, e.g. $ a^2 + b^2 = c^2 $";
   }
 }
 

@@ -191,6 +191,10 @@ input:checked~.slider::before {
 .input-wrapper.math-mode-disabled .math-delimiter {
     opacity: 0;
     visibility: hidden;
+    height: 0;
+    padding: 0;
+    border: none;
+    overflow: hidden;
 }
 
 .input-wrapper.math-mode-disabled textarea {
