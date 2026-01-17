@@ -1,6 +1,6 @@
 import { DOM_IDS, DEFAULTS, BUTTON_TEXT, STORAGE_KEYS, FILL_COLOR_DISABLED } from "./constants.js";
 import { getInputElement, getHTMLElement, getAreaElement } from "./utils/dom.js";
-import { insertOrUpdateFormula } from "./powerpoint.js";
+import { insertOrUpdateFormula } from "./insertion.js";
 import { getStoredValue } from "./utils/storage.js";
 
 /**
