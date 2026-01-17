@@ -79,6 +79,6 @@ export const BUTTON_TEXT = {
  * Default values.
  */
 export const DEFAULTS = {
-  FONT_SIZE: "20",
+  FONT_SIZE: "40",
   FILL_COLOR: "#000000",
 } as const;
