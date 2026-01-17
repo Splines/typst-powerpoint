@@ -8,74 +8,6 @@ import { lastTypstShapeId, TypstShapeInfo, writeShapeProperties } from "./shape.
 import { STORAGE_KEYS } from "./constants.js";
 
 /**
- * Finds a Typst shape in the current selection or uses cached selection.
- */
-async function findTypstShape(selectedShapes: PowerPoint.Shape[], allSlides: PowerPoint.Slide[],
-  context: PowerPoint.RequestContext): Promise<PowerPoint.Shape | undefined> {
-  const typstShape = selectedShapes.find(
-    shape => isTypstPayload(shape.altTextDescription),
-  );
-  if (typstShape) return typstShape;
-
-  if (!lastTypstShapeId) return undefined;
-  const id = lastTypstShapeId;
-
-  try {
-    const targetSlide = allSlides.find(slide => slide.id === id.slideId) || allSlides[0];
-    if (targetSlide.isNullObject) return undefined;
-
-    targetSlide.shapes.load("items");
-    await context.sync();
-
-    if (targetSlide.shapes.items.length === 0) return undefined;
-
-    targetSlide.shapes.items.forEach(shape =>
-      shape.load(["id", "altTextDescription", "left", "top", "width", "height"]),
-    );
-    await context.sync();
-
-    return targetSlide.shapes.items.find(shape => shape.id === id.shapeId);
-  } catch (error) {
-    debug("Fallback to last selection failed:", error);
-    return undefined;
-  }
-}
-
-/**
- * Finds the newly inserted shape on a slide.
- *
- * @param slideId Target slide ID
- * @param existingShapeIds IDs of shapes before insertion
- * @param context PowerPoint context
- * @returns The new shape or null
- */
-async function findInsertedShape(slideId: string, existingShapeIds: Set<string>,
-  context: PowerPoint.RequestContext): Promise<PowerPoint.Shape | null> {
-  try {
-    const slide = context.presentation.slides.getItem(slideId);
-    slide.shapes.load("items/id");
-    await context.sync();
-
-    const newShapes = slide.shapes.items.filter(shape => !existingShapeIds.has(shape.id));
-    if (newShapes.length > 0) {
-      return newShapes[newShapes.length - 1];
-    }
-
-    if (slide.shapes.items.length > 0) {
-      return slide.shapes.items[slide.shapes.items.length - 1];
-    }
-  } catch (error) {
-    debug("Shape diff fallback failed", error);
-  }
-
-  const postShapes = context.presentation.getSelectedShapes();
-  postShapes.load("items");
-  await context.sync();
-
-  return postShapes.items.length > 0 ? postShapes.items[postShapes.items.length - 1] : null;
-}
-
-/**
  * Inserts or updates a Typst formula in PowerPoint.
  */
 export async function insertOrUpdateFormula() {
@@ -177,4 +109,72 @@ function createTypstShape(svg: string, targetSlide: PowerPoint.Slide,
     });
   },
   );
+}
+
+/**
+ * Finds a Typst shape in the current selection or uses cached selection.
+ */
+async function findTypstShape(selectedShapes: PowerPoint.Shape[], allSlides: PowerPoint.Slide[],
+  context: PowerPoint.RequestContext): Promise<PowerPoint.Shape | undefined> {
+  const typstShape = selectedShapes.find(
+    shape => isTypstPayload(shape.altTextDescription),
+  );
+  if (typstShape) return typstShape;
+
+  if (!lastTypstShapeId) return undefined;
+  const id = lastTypstShapeId;
+
+  try {
+    const targetSlide = allSlides.find(slide => slide.id === id.slideId) || allSlides[0];
+    if (targetSlide.isNullObject) return undefined;
+
+    targetSlide.shapes.load("items");
+    await context.sync();
+
+    if (targetSlide.shapes.items.length === 0) return undefined;
+
+    targetSlide.shapes.items.forEach(shape =>
+      shape.load(["id", "altTextDescription", "left", "top", "width", "height"]),
+    );
+    await context.sync();
+
+    return targetSlide.shapes.items.find(shape => shape.id === id.shapeId);
+  } catch (error) {
+    debug("Fallback to last selection failed:", error);
+    return undefined;
+  }
+}
+
+/**
+ * Finds the newly inserted shape on a slide.
+ *
+ * @param slideId Target slide ID
+ * @param existingShapeIds IDs of shapes before insertion
+ * @param context PowerPoint context
+ * @returns The new shape or null
+ */
+async function findInsertedShape(slideId: string, existingShapeIds: Set<string>,
+  context: PowerPoint.RequestContext): Promise<PowerPoint.Shape | null> {
+  try {
+    const slide = context.presentation.slides.getItem(slideId);
+    slide.shapes.load("items/id");
+    await context.sync();
+
+    const newShapes = slide.shapes.items.filter(shape => !existingShapeIds.has(shape.id));
+    if (newShapes.length > 0) {
+      return newShapes[newShapes.length - 1];
+    }
+
+    if (slide.shapes.items.length > 0) {
+      return slide.shapes.items[slide.shapes.items.length - 1];
+    }
+  } catch (error) {
+    debug("Shape diff fallback failed", error);
+  }
+
+  const postShapes = context.presentation.getSelectedShapes();
+  postShapes.load("items");
+  await context.sync();
+
+  return postShapes.items.length > 0 ? postShapes.items[postShapes.items.length - 1] : null;
 }
