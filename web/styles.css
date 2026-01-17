@@ -257,6 +257,19 @@ button {
     gap: 6px;
     justify-content: center;
     align-items: center;
+    background: linear-gradient(135deg, #0078d4 0%, #00AFE0 100%);
+
+    &:hover {
+        background: linear-gradient(135deg, #005a9e 0%, #00a0d2 100%);
+    }
+
+    &.update-mode {
+        background: var(--button-bg);
+
+        &:hover {
+            background: var(--button-hover);
+        }
+    }
 }
 
 .footer {

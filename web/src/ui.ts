@@ -121,6 +121,13 @@ export function setTypstCode(typstCode: string) {
 export function setButtonText(isEditingExistingFormula: boolean) {
   const button = getHTMLElement(DOM_IDS.INSERT_BTN) as HTMLButtonElement;
   button.innerHTML = isEditingExistingFormula ? BUTTON_TEXT.UPDATE : BUTTON_TEXT.INSERT;
+
+  // Add visual differentiation for update mode
+  if (isEditingExistingFormula) {
+    button.classList.add("update-mode");
+  } else {
+    button.classList.remove("update-mode");
+  }
 }
 
 /**
