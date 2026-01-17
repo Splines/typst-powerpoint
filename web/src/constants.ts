@@ -71,8 +71,8 @@ export const PREVIEW_CONFIG = {
  * Button text.
  */
 export const BUTTON_TEXT = {
-  INSERT: "Insert (Ctrl+Enter)",
-  UPDATE: "Update (Ctrl+Enter)",
+  INSERT: "Insert <kbd>Ctrl+Enter</kbd>",
+  UPDATE: "Update <kbd>Ctrl+Enter</kbd>",
 } as const;
 
 /**

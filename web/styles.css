@@ -127,7 +127,7 @@ textarea {
     border: 1px solid var(--border-color);
     border-radius: 4px;
     padding: 8px;
-    font-family: 'Courier New', monospace;
+    font-family: "Courier New", monospace;
     font-size: 0.9rem;
     font-weight: bold;
     background: var(--bg-secondary);
@@ -154,6 +154,22 @@ button {
         background: var(--button-disabled);
         cursor: not-allowed;
     }
+
+    kbd {
+        font-family: "Courier New", monospace;
+        font-size: 0.85em;
+        padding: 2px 6px;
+        background: rgba(255, 255, 255, 0.2);
+        border-radius: 3px;
+        font-weight: bold;
+    }
+}
+
+#insertBtn {
+    display: flex;
+    gap: 6px;
+    justify-content: center;
+    align-items: center;
 }
 
 .footer {
