@@ -41,7 +41,8 @@ async function findTypstShape(selectedShapes: PowerPoint.Shape[], allSlides: Pow
 }
 
 /**
- * Tags a shape with Typst metadata
+ * Tags a shape with Typst metadata.
+ *
  * @param shape PowerPoint shape object
  * @param payload Encoded Typst source
  * @param fontSize Font size value
@@ -72,7 +73,8 @@ async function tagShape(shape: PowerPoint.Shape, payload: string, fontSize: stri
 }
 
 /**
- * Finds the newly inserted shape on a slide
+ * Finds the newly inserted shape on a slide.
+ *
  * @param slideId Target slide ID
  * @param existingShapeIds IDs of shapes before insertion
  * @param context PowerPoint context
@@ -105,7 +107,7 @@ async function findInsertedShape(slideId: string, existingShapeIds: Set<string>,
 }
 
 /**
- * Inserts or updates a Typst formula in PowerPoint
+ * Inserts or updates a Typst formula in PowerPoint.
  */
 export async function insertOrUpdateFormula() {
   const rawCode = getTypstCode();
@@ -118,12 +120,10 @@ export async function insertOrUpdateFormula() {
   debug("Handle action start");
   const svgOutput = await typst(rawCode, fontSize);
 
-  if (typeof svgOutput !== "string" || svgOutput.startsWith("Error:")) {
-    setStatus(svgOutput || "Typst compile failed.", true);
+  if (typeof svgOutput !== "string") {
+    setStatus("Typst compile failed.", true);
     return;
   }
-
-  const payload = createTypstPayload(rawCode);
 
   try {
     await PowerPoint.run(async (context) => {
@@ -136,6 +136,15 @@ export async function insertOrUpdateFormula() {
       allSlides.load("items");
       await context.sync();
 
+      const targetSlide = selectedSlides.items[0] || allSlides.items[0];
+      if (targetSlide.isNullObject) {
+        setStatus("No slide available to insert SVG.", true);
+        return;
+      }
+      const slideId = targetSlide.id;
+      targetSlide.load(["id", "shapes/items/id"]);
+      await context.sync();
+
       if (selection.items.length > 0) {
         selection.items.forEach(shape =>
           shape.load(["id", "altTextDescription", "left", "top", "width", "height"]),
@@ -143,25 +152,10 @@ export async function insertOrUpdateFormula() {
         await context.sync();
       }
 
-      debug("Selected shapes:", selection.items.length);
-
-      const targetSlide = selectedSlides.items[0] || allSlides.items[0];
-      if (targetSlide.isNullObject) {
-        setStatus("No slide available to insert SVG.", true);
-        return;
-      }
-
-      targetSlide.load(["id", "shapes/items/id"]);
-      await context.sync();
-
-      const slideId = targetSlide.id;
-      const existingShapeIds = new Set(targetSlide.shapes.items.map(shape => shape.id));
-
       let position: { left: number; top: number } | null = null;
       let isReplacing = false;
 
       const typstShape = await findTypstShape(selection.items, allSlides.items, context);
-
       if (typstShape) {
         position = { left: typstShape.left, top: typstShape.top };
         typstShape.delete();
@@ -173,6 +167,7 @@ export async function insertOrUpdateFormula() {
       if (fillColor) {
         applyFillColor(svgElement, fillColor);
       }
+
       const serializer = new XMLSerializer();
       const preparedSvg = serializer.serializeToString(svgElement);
 
@@ -187,6 +182,7 @@ export async function insertOrUpdateFormula() {
           }
 
           void PowerPoint.run(async (ctx2) => {
+            const existingShapeIds = new Set(targetSlide.shapes.items.map(shape => shape.id));
             const shapeToTag = await findInsertedShape(slideId, existingShapeIds, ctx2);
 
             if (!shapeToTag) {
@@ -195,6 +191,7 @@ export async function insertOrUpdateFormula() {
               return;
             }
 
+            const payload = createTypstPayload(rawCode);
             await tagShape(shapeToTag, payload, fontSize, fillColor, position, size, ctx2);
 
             debug("Inserted/updated shape tagged", {
@@ -260,7 +257,6 @@ export async function handleSelectionChange() {
   await PowerPoint.run(async (context) => {
     const shapes = context.presentation.getSelectedShapes();
     const slides = context.presentation.getSelectedSlides();
-
     shapes.load("items");
     slides.load("items/id");
     await context.sync();
@@ -272,66 +268,62 @@ export async function handleSelectionChange() {
       await context.sync();
     }
 
-    debug("Selection changed, count:", shapes.items.length);
-
-    let isTypstShape = false;
-
-    if (shapes.items.length >= 1) {
-      const typstShape = shapes.items.find(shape =>
-        isTypstPayload(shape.altTextDescription),
-      );
-
-      if (typstShape && typstShape.altTextDescription) {
-        isTypstShape = true;
-
-        try {
-          const typstCode = extractTypstCode(typstShape.altTextDescription);
-          const storedFontSize = await readShapeTag(typstShape, SHAPE_CONFIG.TAGS.FONT_SIZE, context);
-          const storedFillColor = await readShapeTag(typstShape, SHAPE_CONFIG.TAGS.FILL_COLOR, context);
-
-          setFontSize(storedFontSize || DEFAULTS.FONT_SIZE);
-
-          const actualColor = await detectFillColor(typstShape, context);
-
-          let fillColorToSet;
-          if (actualColor) {
-            fillColorToSet = actualColor;
-            debug("Using detected color from shape:", actualColor);
-          } else if (storedFillColor === FILL_COLOR_DISABLED || !storedFillColor) {
-            fillColorToSet = null;
-          } else {
-            fillColorToSet = storedFillColor;
-          }
-
-          setFillColor(fillColorToSet);
-          setTypstCode(typstCode);
-
-          debug("Loaded Typst payload from selection");
-
-          const slideId = slides.items.length > 0 ? slides.items[0].id : null;
-          setLastTypstForm({
-            slideId,
-            shapeId: typstShape.id,
-            left: typstShape.left,
-            top: typstShape.top,
-            width: typstShape.width,
-            height: typstShape.height,
-          });
-
-          void updatePreview();
-        } catch (error) {
-          console.error("Decode error:", error);
-          setStatus("Failed to decode Typst payload from selection.", true);
-        }
-      } else {
-        debug("No TYPST payload on selection");
-      }
-    }
-
-    if (!isTypstShape) {
+    if (shapes.items.length === 0) {
       setLastTypstForm(null);
+      setButtonText(false);
+      return;
     }
 
-    setButtonText(isTypstShape);
+    const typstShape = shapes.items.find(shape =>
+      isTypstPayload(shape.altTextDescription),
+    );
+
+    if (typstShape && typstShape.altTextDescription) {
+      const slideId = slides.items.length > 0 ? slides.items[0].id : null;
+      await loadTypstShape(typstShape, slideId, context);
+      setButtonText(true);
+    } else {
+      setLastTypstForm(null);
+      setButtonText(false);
+    }
   });
+}
+
+/**
+ * Loads Typst shape data into the UI state.
+ */
+async function loadTypstShape(typstShape: PowerPoint.Shape, slideId: string | null,
+  context: PowerPoint.RequestContext) {
+  try {
+    const typstCode = extractTypstCode(typstShape.altTextDescription);
+    const storedFontSize = await readShapeTag(typstShape, SHAPE_CONFIG.TAGS.FONT_SIZE, context);
+    const storedFillColor = await readShapeTag(typstShape, SHAPE_CONFIG.TAGS.FILL_COLOR, context);
+
+    setFontSize(storedFontSize || DEFAULTS.FONT_SIZE);
+    const actualColor = await detectFillColor(typstShape, context);
+    let fillColorToSet;
+    if (actualColor) {
+      fillColorToSet = actualColor;
+    } else if (storedFillColor === FILL_COLOR_DISABLED || !storedFillColor) {
+      fillColorToSet = null;
+    } else {
+      fillColorToSet = storedFillColor;
+    }
+
+    setFillColor(fillColorToSet);
+    setTypstCode(typstCode);
+    setLastTypstForm({
+      slideId,
+      shapeId: typstShape.id,
+      left: typstShape.left,
+      top: typstShape.top,
+      width: typstShape.width,
+      height: typstShape.height,
+    });
+
+    void updatePreview();
+  } catch (error) {
+    console.error("Decode error:", error);
+    setStatus("Failed to decode Typst payload from selection.", true);
+  }
 }
