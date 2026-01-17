@@ -105,5 +105,10 @@ export default defineConfig([
         plugins: { css },
         language: "css/css",
         extends: [css.configs.recommended],
+        rules: {
+            "css/use-baseline": ["error", { 
+                allowSelectors: ["nesting", "resize", "zoom"]
+            }],
+        }
     },
 ]);

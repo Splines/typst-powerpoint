@@ -9,19 +9,19 @@
     --button-hover: #005a9e;
     --button-disabled: #555;
     --error-color: #f48771;
-}
 
-:root.light-mode {
-    --bg-primary: #f4f4f4;
-    --bg-secondary: #ffffff;
-    --bg-tertiary: #ffffff;
-    --text-primary: #333333;
-    --text-secondary: #666666;
-    --border-color: #cccccc;
-    --button-bg: #0078d4;
-    --button-hover: #005a9e;
-    --button-disabled: #aaaaaa;
-    --error-color: #b00020;
+    &.light-mode {
+        --bg-primary: #f4f4f4;
+        --bg-secondary: #ffffff;
+        --bg-tertiary: #ffffff;
+        --text-primary: #333333;
+        --text-secondary: #666666;
+        --border-color: #cccccc;
+        --button-bg: #0078d4;
+        --button-hover: #005a9e;
+        --button-disabled: #aaaaaa;
+        --error-color: #b00020;
+    }
 }
 
 body {
@@ -30,7 +30,6 @@ body {
     font-family: sans-serif;
     background: var(--bg-primary);
     color: var(--text-primary);
-    /* eslint-disable-next-line css/use-baseline */
     zoom: 114%;
     transition: background 0.2s, color 0.2s;
 }
@@ -41,23 +40,22 @@ body {
     margin-top: 12px;
     padding-top: 12px;
     border-top: 1px solid var(--border-color);
-}
 
-.theme-toggle label {
-    display: flex;
-    align-items: center;
-    cursor: pointer;
-    font-size: 13px;
-    color: var(--text-primary);
-    /* eslint-disable-next-line css/use-baseline */
-    user-select: none;
-}
+    label {
+        display: flex;
+        align-items: center;
+        cursor: pointer;
+        font-size: 13px;
+        color: var(--text-primary);
+        user-select: none;
+    }
 
-.theme-toggle input[type="checkbox"] {
-    margin-right: 8px;
-    cursor: pointer;
-    width: 16px;
-    height: 16px;
+    input[type="checkbox"] {
+        margin-right: 8px;
+        cursor: pointer;
+        width: 16px;
+        height: 16px;
+    }
 }
 
 .controls {
@@ -66,7 +64,30 @@ body {
     gap: 10px;
     margin-bottom: 12px;
     font-size: 13px;
-    color: var(--text-primary);     
+    color: var(--text-primary);
+
+    label {
+        font-weight: 600;
+    }
+
+    input[type="number"] {
+        width: 40px;
+        padding: 4px;
+        border: 1px solid var(--border-color);
+        border-radius: 4px;
+        background: var(--bg-secondary);
+        color: var(--text-primary);
+    }
+
+    input[type="color"] {
+        width: 40px;
+        height: 28px;
+        padding: 2px;
+        border: 1px solid var(--border-color);
+        border-radius: 4px;
+        background: var(--bg-secondary);
+        cursor: pointer;
+    }
 }
 
 .control-group {
@@ -75,51 +96,28 @@ body {
     gap: 8px;
 }
 
-.controls label {
-    font-weight: 600;
-}
-
-.controls input[type="number"] {
-    width: 40px;
-    padding: 4px;
-    border: 1px solid var(--border-color);
-    border-radius: 4px;
-    background: var(--bg-secondary);
-    color: var(--text-primary);
-}
-
-.controls input[type="color"] {
-    width: 40px;
-    height: 28px;
-    padding: 2px;
-    border: 1px solid var(--border-color);
-    border-radius: 4px;
-    background: var(--bg-secondary);
-    cursor: pointer;
-}
-
 .fill-color-group {
     display: flex;
     align-items: center;
     gap: 8px;
-}
 
-.fill-color-group label {
-    display: flex;
-    align-items: center;
-    margin: 0;
-}
+    label {
+        display: flex;
+        align-items: center;
+        margin: 0;
+    }
 
-.fill-color-group input[type="checkbox"] {
-    margin: 0 4px 0 0;
-    cursor: pointer;
-    width: 16px;
-    height: 16px;
-}
+    input[type="checkbox"] {
+        margin: 0 4px 0 0;
+        cursor: pointer;
+        width: 16px;
+        height: 16px;
+    }
 
-.fill-color-group input[type="color"]:disabled {
-    opacity: 0.5;
-    cursor: not-allowed;
+    input[type="color"]:disabled {
+        opacity: 0.5;
+        cursor: not-allowed;
+    }
 }
 
 textarea {
@@ -133,7 +131,6 @@ textarea {
     font-size: 14px;
     background: var(--bg-secondary);
     color: var(--text-primary);
-    /* eslint-disable-next-line css/use-baseline */
     resize: vertical;
 }
 
@@ -147,15 +144,15 @@ button {
     border-radius: 2px;
     cursor: pointer;
     font-weight: bold;
-}
 
-button:hover {
-    background: var(--button-hover);
-}
+    &:hover {
+        background: var(--button-hover);
+    }
 
-button:disabled {
-    background: var(--button-disabled);
-    cursor: not-allowed;
+    &:disabled {
+        background: var(--button-disabled);
+        cursor: not-allowed;
+    }
 }
 
 .footer {
@@ -168,10 +165,10 @@ button:disabled {
     margin-top: 10px;
     font-size: 12px;
     color: var(--text-primary);
-}
 
-.status.error {
-    color: var(--error-color);
+    &.error {
+        color: var(--error-color);
+    }
 }
 
 #previewContainer {
