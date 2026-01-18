@@ -51,6 +51,13 @@
     <button id="bulkUpdateBtn" style="display: none;">Update font size</button>
     <div id="status" class="status"></div>
 
+    <div id="themeToggle">
+      <label>
+        <input id="darkModeToggle" type="checkbox" alt="Toggle dark mode" checked>
+        <span class="slider"></span>
+      </label>
+    </div>
+
     <div class="file-dropzone">
       <div class="dropzone-container">
         <label id="dropzoneLabel" class="dropzone-label">
@@ -68,17 +75,6 @@
         <button id="generateFromFileBtn" style="display: none;">Generate from file</button>
       </div>
     </div>
-
-    <hr>
-
-    <div id="themeToggle">
-      <label>
-        <input id="darkModeToggle" type="checkbox" alt="Toggle dark mode" checked>
-        <span class="slider"></span>
-      </label>
-    </div>
-
-    <span id="spaceBelow"></span>
 
     <script type="module" defer src="src/main.js"></script>
   </body>

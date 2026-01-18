@@ -1,11 +1,6 @@
 .file-dropzone {
-    position: sticky;
-    bottom: 0;
     background: var(--bg-primary);
     padding: 12px 0;
-    margin-top: 20px;
-    border-top: 1px solid var(--border-color);
-    z-index: 10;
 }
 
 .dropzone-container {

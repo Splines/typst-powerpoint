@@ -48,6 +48,7 @@ hr {
 
     position: relative;
     width: var(--toggle-width);
+    margin-bottom: 5em;
 
     input {
         position: absolute;
@@ -398,9 +399,4 @@ button {
         background: #2196f33d;
         color: #64b5f6;
     }
-}
-
-#spaceBelow {
-    display: block;
-    height: 5em;
 }
