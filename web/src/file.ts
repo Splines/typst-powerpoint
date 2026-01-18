@@ -235,17 +235,13 @@ export function clearFilePickerError() {
  *
  * This is registered as a FunctionFile command in manifest.xml.
  */
-export function generateFromFile(event: Office.AddinCommands.Event): void {
+export async function generateFromFile(event: Office.AddinCommands.Event) {
   try {
     if (!fileHandle) {
-      void Office.addin.showAsTaskpane();
-
-      setTimeout(() => {
-        showFilePickerError();
-      }, 100);
+      await Office.addin.showAsTaskpane();
+      showFilePickerError();
     } else {
-      const generateBtn = getButtonElement(DOM_IDS.GENERATE_FROM_FILE_BTN);
-      generateBtn.click();
+      await handleGenerateFromFile();
     }
 
     event.completed();
@@ -253,10 +249,6 @@ export function generateFromFile(event: Office.AddinCommands.Event): void {
     console.error("Error in generateFromFile command:", error);
     event.completed();
   }
-}
-
-export function registerGenerateFromFileCommand() {
-  Office.actions.associate("generateFromFile", generateFromFile);
 }
 
 /**
