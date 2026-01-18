@@ -17,8 +17,8 @@
     flex-direction: column;
     align-items: center;
     justify-content: center;
-    min-height: 100px;
-    padding: 20px;
+    min-height: 80px;
+    padding: 16px;
     border: 2px dashed var(--border-color);
     border-radius: 8px;
     background: var(--bg-secondary);
@@ -26,23 +26,23 @@
     cursor: pointer;
     transition: all 0.2s ease;
     text-align: center;
-}
 
-.dropzone-label:hover {
-    border-color: var(--button-bg);
-    background: var(--bg-tertiary);
-}
+    &:hover {
+        border-color: var(--button-bg);
+        background: var(--bg-tertiary);
+    }
 
-.dropzone-label.drag-over {
-    border-color: var(--button-bg);
-    background: var(--bg-tertiary);
-    border-style: solid;
-    transform: scale(1.02);
+    &.drag-over {
+        border-color: var(--button-bg);
+        background: var(--bg-tertiary);
+        border-style: solid;
+        transform: scale(1.02);
+    }
 }
 
 .dropzone-icon {
-    font-size: 2em;
-    margin-bottom: 8px;
+    font-size: 1.8em;
+    margin-bottom: 6px;
     opacity: 0.6;
 }
 
@@ -65,15 +65,15 @@
     margin-top: 8px;
     font-size: 12px;
     color: var(--text-secondary);
-}
 
-.dropzone-status.show {
-    display: block;
-}
+    &.show {
+        display: block;
+    }
 
-.dropzone-status.error {
-    color: var(--error-color);
-    font-weight: bold;
+    &.error {
+        color: var(--error-color);
+        font-weight: bold;
+    }
 }
 
 .file-info {
@@ -85,10 +85,10 @@
     background: var(--bg-tertiary);
     border-radius: 6px;
     border: 1px solid var(--border-color);
-}
 
-.file-info.show {
-    display: flex;
+    &.show {
+        display: flex;
+    }
 }
 
 .file-icon {
