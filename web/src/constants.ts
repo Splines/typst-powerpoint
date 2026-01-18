@@ -38,7 +38,6 @@ export const DOM_IDS = {
   DIAGNOSTICS_CONTENT: "diagnosticsContent",
   FILE_INPUT: "fileInput",
   GENERATE_FROM_FILE_BTN: "generateFromFileBtn",
-  FILE_PICKER_LABEL: "filePickerLabel",
 } as const;
 
 /**
@@ -50,7 +49,6 @@ export const STORAGE_KEYS = {
   MATH_MODE: "typstMathMode",
   THEME: "typstTheme",
   LAST_FILE_PATH: "typstLastFilePath",
-  LAST_FILE_HANDLE: "typstLastFileHandle",
 } as const;
 
 /**

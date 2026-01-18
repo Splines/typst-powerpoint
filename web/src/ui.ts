@@ -2,7 +2,7 @@ import { DOM_IDS, DEFAULTS, BUTTON_TEXT, STORAGE_KEYS, FILL_COLOR_DISABLED } fro
 import { getInputElement, getHTMLElement, getAreaElement, getButtonElement } from "./utils/dom.js";
 import { insertOrUpdateFormula, bulkUpdateFontSize } from "./insertion.js";
 import { getStoredValue } from "./utils/storage.js";
-import { handleFileSelection, handleGenerateFromFile } from "./file.js";
+import { handleGenerateFromFile } from "./file.js";
 
 /**
  * Initializes the UI state.
@@ -46,9 +46,6 @@ export function setupEventListeners() {
 
   const fontSizeInput = getInputElement(DOM_IDS.FONT_SIZE);
   fontSizeInput.addEventListener("keydown", handleCtrlEnter);
-
-  const fileInput = getButtonElement(DOM_IDS.FILE_INPUT);
-  fileInput.addEventListener("click", handleFileSelection);
 
   const generateFromFileBtn = getButtonElement(DOM_IDS.GENERATE_FROM_FILE_BTN);
   generateFromFileBtn.onclick = handleGenerateFromFile;

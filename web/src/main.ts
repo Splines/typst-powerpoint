@@ -3,7 +3,7 @@ import { initTypst } from "./typst.js";
 import { setupPreviewListeners, updateButtonState } from "./preview.js";
 import { initializeDarkMode, setupDarkModeToggle } from "./theme.js";
 import { handleSelectionChange } from "./selection.js";
-import { generateFromFile, initializeFilePicker } from "./file.js";
+import { generateFromFile, initializeDropzone } from "./file.js";
 
 // eslint-disable-next-line @typescript-eslint/no-misused-promises
 Office.actions.associate("generateFromFile", generateFromFile);
@@ -22,7 +22,7 @@ await Office.onReady(async (info) => {
   setupDarkModeToggle();
 
   initializeUIState();
-  await initializeFilePicker();
+  initializeDropzone();
   setupEventListeners();
   setupPreviewListeners();
   updateButtonState();

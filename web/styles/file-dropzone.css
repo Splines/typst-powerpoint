@@ -1,0 +1,121 @@
+.file-dropzone {
+    position: sticky;
+    bottom: 0;
+    background: var(--bg-primary);
+    padding: 12px 0;
+    margin-top: 20px;
+    border-top: 1px solid var(--border-color);
+    z-index: 10;
+}
+
+.dropzone-container {
+    position: relative;
+}
+
+.dropzone-label {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    min-height: 100px;
+    padding: 20px;
+    border: 2px dashed var(--border-color);
+    border-radius: 8px;
+    background: var(--bg-secondary);
+    color: var(--text-secondary);
+    cursor: pointer;
+    transition: all 0.2s ease;
+    text-align: center;
+}
+
+.dropzone-label:hover {
+    border-color: var(--button-bg);
+    background: var(--bg-tertiary);
+}
+
+.dropzone-label.drag-over {
+    border-color: var(--button-bg);
+    background: var(--bg-tertiary);
+    border-style: solid;
+    transform: scale(1.02);
+}
+
+.dropzone-icon {
+    font-size: 2em;
+    margin-bottom: 8px;
+    opacity: 0.6;
+}
+
+.dropzone-text {
+    font-size: 14px;
+    font-weight: 500;
+}
+
+.dropzone-subtext {
+    font-size: 11px;
+    margin-top: 4px;
+    opacity: 0.8;
+}
+
+.dropzone-input {
+    display: none;
+}
+
+.dropzone-status {
+    margin-top: 8px;
+    font-size: 12px;
+    color: var(--text-secondary);
+}
+
+.dropzone-status.show {
+    display: block;
+}
+
+.dropzone-status.error {
+    color: var(--error-color);
+    font-weight: bold;
+}
+
+.file-info {
+    display: none;
+    align-items: center;
+    gap: 12px;
+    margin-top: 12px;
+    padding: 12px;
+    background: var(--bg-tertiary);
+    border-radius: 6px;
+    border: 1px solid var(--border-color);
+}
+
+.file-info.show {
+    display: flex;
+}
+
+.file-icon {
+    font-size: 1.5em;
+    opacity: 0.7;
+}
+
+.file-details {
+    flex: 1;
+    min-width: 0;
+}
+
+.file-name {
+    font-size: 13px;
+    font-weight: 600;
+    color: var(--text-primary);
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+.file-meta {
+    font-size: 11px;
+    color: var(--text-secondary);
+    margin-top: 2px;
+}
+
+#generateFromFileBtn {
+    margin-top: 12px;
+}

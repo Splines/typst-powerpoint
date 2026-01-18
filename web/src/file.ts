@@ -26,6 +26,43 @@ declare global {
 }
 
 /**
+ * Updates the UI with the selected file information.
+ */
+function updateFileUI(file: File) {
+  const generateBtn = getButtonElement(DOM_IDS.GENERATE_FROM_FILE_BTN);
+  const fileInfo = getHTMLElement("fileInfo");
+  const fileName = getHTMLElement("fileName");
+  const fileMeta = getHTMLElement("fileMeta");
+  const dropzoneLabel = getHTMLElement("dropzoneLabel");
+
+  // Update file info
+  fileName.textContent = file.name;
+  fileMeta.textContent = `${(file.size / 1024).toFixed(1)} KB`;
+
+  // Show file info and hide dropzone label
+  fileInfo.classList.add("show");
+  dropzoneLabel.style.display = "none";
+  generateBtn.style.display = "block";
+
+  // Store file name for display
+  storeValue(STORAGE_KEYS.LAST_FILE_PATH as string, file.name);
+}
+
+/**
+ * Processes a selected file (from either picker or drop).
+ */
+function processFile(file: File): void {
+  // Check if it's a valid file type
+  if (!file.name.endsWith(".typ") && !file.name.endsWith(".txt")) {
+    setStatus("Please select a .typ or .txt file", true);
+    return;
+  }
+
+  updateFileUI(file);
+  setStatus(`Selected: ${file.name}`);
+}
+
+/**
  * Opens the file picker using File System Access API.
  */
 async function pickFile(): Promise<void> {
@@ -46,18 +83,7 @@ async function pickFile(): Promise<void> {
     if (handles.length > 0) {
       fileHandle = handles[0];
       const file = await fileHandle.getFile();
-
-      // Update UI
-      const generateBtn = getButtonElement(DOM_IDS.GENERATE_FROM_FILE_BTN);
-      const filePickerLabel = getHTMLElement(DOM_IDS.FILE_PICKER_LABEL);
-
-      generateBtn.style.display = "block";
-      filePickerLabel.textContent = `Selected: ${file.name}`;
-      filePickerLabel.classList.add("show");
-      filePickerLabel.classList.remove("error-state");
-
-      // Store file name for display
-      storeValue(STORAGE_KEYS.LAST_FILE_PATH as string, file.name);
+      updateFileUI(file);
     }
   } catch (error) {
     // User cancelled or error occurred
@@ -68,7 +94,118 @@ async function pickFile(): Promise<void> {
 }
 
 /**
- * Handles file selection from the file picker.
+ * Handles file input change event.
+ */
+function handleFileInputChange(event: Event) {
+  const input = event.target as HTMLInputElement;
+  const files = input.files;
+
+  if (files && files.length > 0) {
+    processFile(files[0]);
+  }
+}
+
+/**
+ * Handles drag over event.
+ */
+function handleDragOver(event: DragEvent) {
+  event.preventDefault();
+
+  const dropzoneLabel = getHTMLElement("dropzoneLabel");
+  if (!event.dataTransfer?.items) return;
+
+  const fileItems = Array.from(event.dataTransfer.items).filter(item => item.kind === "file");
+
+  if (fileItems.length > 0) {
+    dropzoneLabel.classList.add("drag-over");
+
+    // Check if it's a valid file type
+    const hasValidFile = fileItems.some(item => item.type === "text/plain" || item.type === "");
+
+    event.dataTransfer.dropEffect = hasValidFile ? "copy" : "none";
+  }
+}
+
+/**
+ * Handles drag leave event.
+ */
+function handleDragLeave(event: DragEvent) {
+  const dropzoneLabel = getHTMLElement("dropzoneLabel");
+  const relatedTarget = event.relatedTarget as Node;
+
+  // Only remove drag-over if we're actually leaving the dropzone
+  if (!dropzoneLabel.contains(relatedTarget)) {
+    dropzoneLabel.classList.remove("drag-over");
+  }
+}
+
+/**
+ * Handles drop event.
+ */
+function handleDrop(event: DragEvent) {
+  event.preventDefault();
+
+  const dropzoneLabel = getHTMLElement("dropzoneLabel");
+  dropzoneLabel.classList.remove("drag-over");
+
+  if (!event.dataTransfer?.items) return;
+
+  const files = Array.from(event.dataTransfer.items)
+    .map(item => item.getAsFile())
+    .filter((file): file is File => file !== null);
+
+  if (files.length > 0) {
+    processFile(files[0]);
+  }
+}
+
+/**
+ * Initializes the dropzone event listeners.
+ */
+export function initializeDropzone() {
+  const dropzoneLabel = getHTMLElement("dropzoneLabel");
+  const fileInput = getHTMLElement("fileInput") as HTMLInputElement;
+
+  fileInput.addEventListener("change", handleFileInputChange);
+
+  dropzoneLabel.addEventListener("dragover", handleDragOver);
+  dropzoneLabel.addEventListener("dragleave", handleDragLeave);
+  dropzoneLabel.addEventListener("drop", handleDrop);
+
+  // Prevent default drag behavior on window
+  window.addEventListener("dragover", (e) => {
+    if (!e.dataTransfer?.items) return;
+    const fileItems = Array.from(e.dataTransfer.items).filter(item => item.kind === "file");
+    if (fileItems.length > 0) {
+      e.preventDefault();
+    }
+  });
+
+  window.addEventListener("drop", (e) => {
+    if (!e.dataTransfer?.items) return;
+    const fileItems = Array.from(e.dataTransfer.items).filter(item => item.kind === "file");
+    if (fileItems.length > 0) {
+      e.preventDefault();
+    }
+  });
+
+  // Try to show last used file
+  const lastFilePath = getStoredValue(STORAGE_KEYS.LAST_FILE_PATH as string);
+  if (lastFilePath) {
+    const fileInfo = getHTMLElement("fileInfo");
+    const fileName = getHTMLElement("fileName");
+    const fileMeta = getHTMLElement("fileMeta");
+    const dropzoneLabel = getHTMLElement("dropzoneLabel");
+
+    fileName.textContent = lastFilePath;
+    fileMeta.textContent = "Previously used";
+    fileInfo.classList.add("show");
+    dropzoneLabel.style.display = "none";
+  }
+}
+
+/**
+ * Handles file selection from the file picker (kept for compatibility).
  */
 export function handleFileSelection() {
   // Trigger the File System Access API picker
@@ -116,19 +253,9 @@ export async function handleGenerateFromFile() {
  * Shows the file picker error state when no file is selected.
  */
 export function showFilePickerError() {
-  const filePickerLabel = getHTMLElement(DOM_IDS.FILE_PICKER_LABEL);
-
-  filePickerLabel.classList.add("error-state", "show");
-  filePickerLabel.textContent = "Select a file";
-}
-
-/**
- * Clears the file picker error state.
- */
-export function clearFilePickerError() {
-  const filePickerLabel = getHTMLElement(DOM_IDS.FILE_PICKER_LABEL);
-
-  filePickerLabel.classList.remove("error-state", "show");
+  const dropzoneLabel = getHTMLElement("dropzoneLabel");
+  dropzoneLabel.style.borderColor = "var(--error-color)";
+  setStatus("Please select a file first", true);
 }
 
 /**
@@ -150,17 +277,4 @@ export async function generateFromFile(event: Office.AddinCommands.Event) {
     console.error("Error in generateFromFile command:", error);
     event.completed();
   }
-}
-
-/**
- * Initializes the file picker with the last used file path.
- */
-export function initializeFilePicker() {
-  const lastFilePath = getStoredValue(STORAGE_KEYS.LAST_FILE_PATH as string);
-  if (!lastFilePath) return;
-
-  const filePickerLabel = getHTMLElement(DOM_IDS.FILE_PICKER_LABEL);
-  filePickerLabel.textContent = `Last used: ${lastFilePath}`;
-  filePickerLabel.classList.add("show");
-  filePickerLabel.classList.remove("error-state");
 }
