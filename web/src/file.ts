@@ -71,8 +71,16 @@ function processFile(file: File, handle?: FileSystemFileHandle): void {
 
 /**
  * Opens the file picker using File System Access API.
+ *
+ * Falls back to file input if API is not supported.
  */
 async function pickFile(): Promise<void> {
+  if (!("showOpenFilePicker" in window)) {
+    const fileInput = getHTMLElement("fileInput") as HTMLInputElement;
+    fileInput.click();
+    return;
+  }
+
   try {
     // Use File System Access API to pick a file
     const handles = await window.showOpenFilePicker({
@@ -277,6 +285,15 @@ export async function handleGenerateFromFile() {
       setMathModeEnabled(previousMathMode);
     }
   } catch (error) {
+    // Handle specific error when file can't be read (common with File objects when file changes)
+    if (error instanceof DOMException && error.name === "NotReadableError") {
+      setStatus("File has changed on disk. Please select the file again.", true);
+      fileHandle = null;
+      selectedFile = null;
+      getButtonElement(DOM_IDS.GENERATE_FROM_FILE_BTN).style.display = "none";
+      return;
+    }
+
     // eslint-disable-next-line @typescript-eslint/restrict-template-expressions
     setStatus(`Error reading file: ${error}`, true);
     // Clear the file handle and selected file if no longer accessible
