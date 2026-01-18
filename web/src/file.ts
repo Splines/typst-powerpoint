@@ -36,15 +36,19 @@ declare global {
  */
 function updateFileUI(file: File) {
   const generateBtn = getButtonElement(DOM_IDS.GENERATE_FROM_FILE_BTN);
-  const fileInfo = getHTMLElement("fileInfo");
-  const fileName = getHTMLElement("fileName");
-  const fileMeta = getHTMLElement("fileMeta");
+  generateBtn.style.display = "block";
 
+  const fileInfo = getHTMLElement("fileInfo");
+  fileInfo.classList.add("show");
+
+  const fileName = getHTMLElement("fileName");
   fileName.textContent = file.name;
+
+  const fileMeta = getHTMLElement("fileMeta");
   fileMeta.textContent = "Selected";
 
-  fileInfo.classList.add("show");
-  generateBtn.style.display = "block";
+  const dropzoneLabel = getHTMLElement("dropzoneLabel");
+  dropzoneLabel.style.borderColor = "";
 
   storeValue(STORAGE_KEYS.LAST_FILE_PATH as string, file.name);
 }
