@@ -275,12 +275,6 @@ button {
     }
 }
 
-.footer {
-    margin-top: 20px;
-    font-size: 11px;
-    color: var(--text-secondary);
-}
-
 .status {
     margin-top: 10px;
     font-size: 12px;
