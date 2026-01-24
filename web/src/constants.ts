@@ -85,6 +85,8 @@ export const PREVIEW_CONFIG = {
 export const BUTTON_TEXT = {
   INSERT: "Insert <kbd>Ctrl+Enter</kbd>",
   UPDATE: "Update <kbd>Ctrl+Enter</kbd>",
+  GENERATE_FROM_FILE: "Generate from file",
+  UPDATE_FROM_FILE: "Update from file",
 } as const;
 
 /**

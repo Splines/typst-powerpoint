@@ -8,6 +8,7 @@ import { setStatus } from "../ui.js";
 import { setFileHandle, setSelectedFile } from "./state.js";
 import { updateFileUI } from "./ui.js";
 import { DOM_IDS } from "../constants.js";
+import { lastTypstShapeId } from "../shape.js";
 
 /**
  * Processes a selected file (from either picker or drop).
@@ -21,7 +22,8 @@ export function processFile(file: File, handle?: FileSystemFileHandle): void {
 
   setFileHandle(handle || null);
   setSelectedFile(file);
-  updateFileUI(file);
+  const isEditingExistingFormula = lastTypstShapeId !== null;
+  updateFileUI(file, isEditingExistingFormula);
   setStatus(`Selected: ${file.name}`);
 }
 

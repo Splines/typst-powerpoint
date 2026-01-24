@@ -166,3 +166,11 @@ export function setMathModeEnabled(enabled: boolean) {
   const checkbox = getInputElement(DOM_IDS.MATH_MODE_ENABLED);
   checkbox.checked = enabled;
 }
+
+/**
+ * Updates the file button text based on whether a Typst shape is selected.
+ */
+export function setFileButtonText(isEditingExistingFormula: boolean) {
+  const button = getButtonElement(DOM_IDS.GENERATE_FROM_FILE_BTN);
+  button.textContent = isEditingExistingFormula ? BUTTON_TEXT.UPDATE_FROM_FILE : BUTTON_TEXT.GENERATE_FROM_FILE;
+}

@@ -2,7 +2,7 @@ import { FILL_COLOR_DISABLED, SHAPE_CONFIG, DEFAULTS } from "./constants.js";
 import { extractTypstCode, isTypstPayload } from "./payload.js";
 import { updatePreview, updateButtonState, restoreMathModeFromStorage, updateMathModeVisuals } from "./preview.js";
 import { readShapeTag, setLastTypstId } from "./shape.js";
-import { setButtonText, setFillColor, setFontSize, setMathModeEnabled, setStatus, setTypstCode, setBulkUpdateButtonVisible } from "./ui.js";
+import { setButtonText, setFillColor, setFontSize, setMathModeEnabled, setStatus, setTypstCode, setBulkUpdateButtonVisible, setFileButtonText } from "./ui.js";
 import { debug } from "./utils/logger.js";
 
 /**
@@ -28,6 +28,7 @@ export async function handleSelectionChange() {
       setLastTypstId(null);
       setButtonText(false);
       setBulkUpdateButtonVisible(false);
+      setFileButtonText(false);
       restoreMathModeFromStorage();
       return;
     }
@@ -40,6 +41,7 @@ export async function handleSelectionChange() {
       // Multiple Typst shapes selected - show bulk update button
       setBulkUpdateButtonVisible(true);
       setButtonText(true);
+      setFileButtonText(true);
       setLastTypstId(null);
       restoreMathModeFromStorage();
     } else if (typstShapes.length === 1) {
@@ -48,11 +50,13 @@ export async function handleSelectionChange() {
       const slideId = slides.items.length > 0 ? slides.items[0].id : null;
       await loadTypstShape(typstShape, slideId, context);
       setButtonText(true);
+      setFileButtonText(true);
       setBulkUpdateButtonVisible(false);
     } else {
       // No Typst shapes selected
       setLastTypstId(null);
       setButtonText(false);
+      setFileButtonText(false);
       setBulkUpdateButtonVisible(false);
       restoreMathModeFromStorage();
     }

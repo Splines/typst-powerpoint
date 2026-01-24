@@ -4,12 +4,15 @@
 
 import { DOM_IDS } from "../constants.js";
 import { getButtonElement, getHTMLElement } from "../utils/dom.js";
-import { setStatus } from "../ui.js";
+import { setStatus, setFileButtonText } from "../ui.js";
 
 /**
  * Updates the UI with the selected file information.
+ *
+ * @param file The file to display
+ * @param isEditingExistingFormula Whether a formula is currently selected
  */
-export function updateFileUI(file: File): void {
+export function updateFileUI(file: File, isEditingExistingFormula: boolean): void {
   const generateBtn = getButtonElement(DOM_IDS.GENERATE_FROM_FILE_BTN);
   generateBtn.style.display = "block";
 
@@ -21,6 +24,8 @@ export function updateFileUI(file: File): void {
 
   const dropzoneLabel = getHTMLElement(DOM_IDS.DROPZONE_LABEL);
   dropzoneLabel.style.borderColor = "";
+
+  setFileButtonText(isEditingExistingFormula);
 }
 
 /**
