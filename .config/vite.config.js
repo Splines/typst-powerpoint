@@ -1,11 +1,19 @@
 import { defineConfig } from "vite";
 import fs from "fs";
 
+const input = {
+  main: "web/index.html",
+  powerpoint: "web/powerpoint.html",
+};
+
 export default defineConfig(({ command }) => ({
   root: "web",
   build: {
     outDir: "../build/",
     emptyOutDir: true,
+    rollupOptions: {
+      input,
+    },
   },
   server: {
     port: 3155,
