@@ -4,7 +4,7 @@
 
 import "./types.js";
 import { getHTMLElement } from "../utils/dom.js";
-import { processFile, handleFileInputChange } from "./picker.js";
+import { processFile, handleFileInputChange, pickFile } from "./picker.js";
 
 /**
  * Handles drag over event.
@@ -83,7 +83,13 @@ async function handleDrop(event: DragEvent): Promise<void> {
 export function initializeDropzone(): void {
   const dropzoneLabel = getHTMLElement("dropzoneLabel");
   const fileInput = getHTMLElement("fileInput") as HTMLInputElement;
-
+  // Intercept label clicks to use File System Access API when supported
+  dropzoneLabel.addEventListener("click", (event) => {
+    if (event.target !== fileInput && "showOpenFilePicker" in window) {
+      event.preventDefault();
+      void pickFile();
+    }
+  });
   fileInput.addEventListener("change", handleFileInputChange);
 
   dropzoneLabel.addEventListener("dragover", handleDragOver);
