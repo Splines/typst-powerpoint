@@ -36,6 +36,11 @@ export const DOM_IDS = {
   DARK_MODE_TOGGLE: "darkModeToggle",
   DIAGNOSTICS_CONTAINER: "diagnosticsContainer",
   DIAGNOSTICS_CONTENT: "diagnosticsContent",
+  FILE_INPUT: "fileInput",
+  GENERATE_FROM_FILE_BTN: "generateFromFileBtn",
+  FILE_INFO: "fileInfo",
+  FILE_NAME: "fileName",
+  DROPZONE_LABEL: "dropzoneLabel",
 } as const;
 
 /**
@@ -80,6 +85,8 @@ export const PREVIEW_CONFIG = {
 export const BUTTON_TEXT = {
   INSERT: "Insert <kbd>Ctrl+Enter</kbd>",
   UPDATE: "Update <kbd>Ctrl+Enter</kbd>",
+  GENERATE_FROM_FILE: "Generate from file",
+  UPDATE_FROM_FILE: "Update from file",
 } as const;
 
 /**

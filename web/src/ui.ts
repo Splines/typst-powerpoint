@@ -2,6 +2,7 @@ import { DOM_IDS, DEFAULTS, BUTTON_TEXT, STORAGE_KEYS, FILL_COLOR_DISABLED } fro
 import { getInputElement, getHTMLElement, getAreaElement, getButtonElement } from "./utils/dom.js";
 import { insertOrUpdateFormula, bulkUpdateFontSize } from "./insertion.js";
 import { getStoredValue } from "./utils/storage.js";
+import { handleGenerateFromFile } from "./file/file.js";
 
 /**
  * Initializes the UI state.
@@ -45,6 +46,9 @@ export function setupEventListeners() {
 
   const fontSizeInput = getInputElement(DOM_IDS.FONT_SIZE);
   fontSizeInput.addEventListener("keydown", handleCtrlEnter);
+
+  const generateFromFileBtn = getButtonElement(DOM_IDS.GENERATE_FROM_FILE_BTN);
+  generateFromFileBtn.onclick = handleGenerateFromFile;
 }
 
 /**
@@ -161,4 +165,12 @@ export function getMathModeEnabled(): boolean {
 export function setMathModeEnabled(enabled: boolean) {
   const checkbox = getInputElement(DOM_IDS.MATH_MODE_ENABLED);
   checkbox.checked = enabled;
+}
+
+/**
+ * Updates the file button text based on whether a Typst shape is selected.
+ */
+export function setFileButtonText(isEditingExistingFormula: boolean) {
+  const button = getButtonElement(DOM_IDS.GENERATE_FROM_FILE_BTN);
+  button.textContent = isEditingExistingFormula ? BUTTON_TEXT.UPDATE_FROM_FILE : BUTTON_TEXT.GENERATE_FROM_FILE;
 }
