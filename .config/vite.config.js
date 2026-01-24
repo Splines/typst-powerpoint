@@ -8,6 +8,7 @@ const input = {
 
 export default defineConfig(({ command }) => ({
   root: "web",
+  base: "typst-powerpoint/",
   build: {
     outDir: "../build/",
     emptyOutDir: true,
