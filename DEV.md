@@ -37,7 +37,7 @@ mkcert -cert-file web/certs/localhost.crt -key-file web/certs/localhost.key loca
 # or with OpenSSL:
 # openssl req -x509 -newkey rsa:2048 -nodes -keyout web/certs/localhost.key -out web/certs/localhost.crt -days 365 -subj "/CN=localhost"
 ```
-4) Start the HTTPS dev server (defaults to `https://localhost:3000`):
+4) Start the HTTPS dev server (defaults to `https://localhost:3155`):
 ```bash
 npm run dev
 # optional env:
