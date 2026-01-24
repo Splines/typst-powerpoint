@@ -54,10 +54,7 @@ export async function handleGenerateFromFile(): Promise<void> {
     let statusMsg = `Error reading file: ${error}`;
 
     if (error instanceof DOMException) {
-      if (error.name === "NotFoundError") {
-        statusMsg = "File couldn't be found on disk anymore. Please select your file again.";
-      } else if (error.name === "NotReadableError") {
-        // Check if File System API is supported to provide appropriate error message
+      if (error.name === "NotReadableError") {
         if ("showOpenFilePicker" in window) {
           // File System API is supported but still got error - unexpected
           statusMsg = "Cannot read the file. Please select the file again.";
@@ -67,6 +64,8 @@ export async function handleGenerateFromFile(): Promise<void> {
             + "Please select the file again. (This is a limitation on macOS where the "
             + "File System Access API is not supported.)";
         }
+      } else if (error.name === "NotFoundError") {
+        statusMsg = "File couldn't be found on disk anymore. Please select your file again.";
       }
     }
     setStatus(statusMsg, true);
