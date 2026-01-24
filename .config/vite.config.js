@@ -8,7 +8,7 @@ export default defineConfig({
     emptyOutDir: true,
   },
   server: {
-    port: 3000,
+    port: 3155,
     https: {
       key: fs.readFileSync("web/certs/localhost.key"),
       cert: fs.readFileSync("web/certs/localhost.crt"),
