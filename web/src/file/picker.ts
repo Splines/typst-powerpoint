@@ -7,6 +7,7 @@ import { getHTMLElement } from "../utils/dom.js";
 import { setStatus } from "../ui.js";
 import { setFileHandle, setSelectedFile } from "./state.js";
 import { updateFileUI } from "./ui.js";
+import { DOM_IDS } from "../constants.js";
 
 /**
  * Processes a selected file (from either picker or drop).
@@ -31,7 +32,7 @@ export function processFile(file: File, handle?: FileSystemFileHandle): void {
  */
 export async function pickFile(): Promise<void> {
   if (!("showOpenFilePicker" in window)) {
-    const fileInput = getHTMLElement("fileInput") as HTMLInputElement;
+    const fileInput = getHTMLElement(DOM_IDS.FILE_INPUT) as HTMLInputElement;
     fileInput.click();
     return;
   }
