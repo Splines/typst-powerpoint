@@ -55,15 +55,22 @@ async function handleDrop(event: DragEvent): Promise<void> {
   const items = Array.from(event.dataTransfer.items);
   const fileItem = items.find(item => item.kind === "file");
 
-  if (!fileItem) return;
+  if (!fileItem) {
+    console.error("No file item found in drop event");
+    return;
+  }
 
   let handle: FileSystemFileHandle | undefined;
+  let file: File | null = null;
+
+  // Try to get FileSystemFileHandle first (preferred for re-reading)
   try {
     if ("getAsFileSystemHandle" in fileItem) {
       const fileSystemHandle = await fileItem.getAsFileSystemHandle();
       // eslint-disable-next-line @typescript-eslint/no-unnecessary-condition
       if (fileSystemHandle && fileSystemHandle.kind === "file") {
         handle = fileSystemHandle;
+        file = await handle.getFile();
       }
     }
   } catch (error) {
@@ -71,9 +78,15 @@ async function handleDrop(event: DragEvent): Promise<void> {
     console.log("Could not get FileSystemFileHandle, using File object only:", error);
   }
 
-  const file = fileItem.getAsFile();
+  if (!file) {
+    // Fallback to regular File object if handle approach failed
+    file = fileItem.getAsFile();
+  }
+
   if (file) {
     processFile(file, handle);
+  } else {
+    console.error("Could not retrieve file from drop event");
   }
 }
 
