@@ -1,5 +1,5 @@
 import { updatePreview } from "./preview.js";
-import { getInputElement } from "./utils/dom";
+import { getButtonElement } from "./utils/dom";
 import { DOM_IDS, STORAGE_KEYS, THEMES } from "./constants.js";
 
 /**
@@ -7,8 +7,6 @@ import { DOM_IDS, STORAGE_KEYS, THEMES } from "./constants.js";
  */
 export function initializeDarkMode() {
   const isDarkMode = isDarkModeEnabled();
-  const darkModeToggle = getInputElement(DOM_IDS.DARK_MODE_TOGGLE);
-  darkModeToggle.checked = !isDarkMode;
   applyTheme(isDarkMode);
 }
 
@@ -36,9 +34,9 @@ function applyTheme(isDark: boolean) {
  * Sets up the dark mode toggle listener.
  */
 export function setupDarkModeToggle() {
-  const darkModeToggle = getInputElement(DOM_IDS.DARK_MODE_TOGGLE);
-  darkModeToggle.addEventListener("change", (event) => {
-    const isDark = !(event.target as HTMLInputElement).checked;
+  const themeToggleBtn = getButtonElement(DOM_IDS.THEME_TOGGLE_BTN);
+  themeToggleBtn.addEventListener("click", () => {
+    const isDark = !document.documentElement.classList.contains("dark-mode");
     applyTheme(isDark);
     localStorage.setItem(STORAGE_KEYS.THEME, isDark ? THEMES.DARK : THEMES.LIGHT);
     void updatePreview();

@@ -27,6 +27,7 @@
 body {
     margin: 0;
     padding: 15px;
+    padding-bottom: 60px; /* Space for sticky status bar */
     font-family: sans-serif;
     background: var(--bg-primary);
     color: var(--text-primary);
@@ -38,64 +39,6 @@ hr {
     border: none;
     border-top: 1px solid var(--border-color);
     margin: 12px 0;
-}
-
-/* https://codepen.io/fydsa/pen/abwdpep */
-#themeToggle {
-    --light: #E5E7EB;
-    --dark: #28292c;
-    --toggle-width: 40px;
-
-    position: relative;
-    width: var(--toggle-width);
-    margin-bottom: 5em;
-
-    input {
-        position: absolute;
-        display: none;
-    }
-
-    label {
-        position: absolute;
-        width: 100%;
-        height: calc(var(--toggle-width) * 0.5);
-        background-color: var(--dark);
-        border-radius: calc(var(--toggle-width) * 0.25);
-        cursor: pointer;
-    }
-
-    .slider {
-        position: absolute;
-        width: 100%;
-        height: 100%;
-        border-radius: calc(var(--toggle-width) * 0.240);
-        transition: 0.3s;
-
-        &::before {
-            content: "";
-            position: absolute;
-            top: calc(var(--toggle-width) * 0.065);
-            left: calc(var(--toggle-width) * 0.08);
-            width: calc(var(--toggle-width) * 0.375);
-            height: calc(var(--toggle-width) * 0.375);
-            border-radius: 50%;
-            box-shadow: inset calc(var(--toggle-width) * 0.14) calc(var(--toggle-width) * -0.02) 0px 0px var(--light);
-            background-color: var(--dark);
-            transition: 0.3s;
-        }
-    }
-}
-
-input:checked~.slider {
-    background-color: var(--light);
-}
-
-input:checked~.slider::before {
-    transform: translateX(calc(var(--toggle-width) * 0.475));
-    background-color: white;
-    box-shadow: none;
-    border: 1px solid lightgray;
-    top: calc(var(--toggle-width) * 0.066 - 1px);
 }
 
 .controls {
@@ -273,16 +216,6 @@ button {
         &:hover {
             background: var(--button-hover);
         }
-    }
-}
-
-.status {
-    margin-top: 10px;
-    font-size: 12px;
-    color: var(--text-primary);
-
-    &.error {
-        color: var(--error-color);
     }
 }
 
