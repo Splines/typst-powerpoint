@@ -122,8 +122,8 @@
       <bt:ShortStrings>
         <bt:String id="GetStarted.Title" DefaultValue="Get started with Typst!" />
         <bt:String id="Group.Label" DefaultValue="Typst" />
-        <bt:String id="TaskpaneButton.Label" DefaultValue="Typst Editor" />
-        <bt:String id="GenerateFromFileButton.Label" DefaultValue="Generate from File" />
+        <bt:String id="TaskpaneButton.Label" DefaultValue="PPTypst" />
+        <bt:String id="GenerateFromFileButton.Label" DefaultValue="Generate from file" />
       </bt:ShortStrings>
 
       <bt:LongStrings>
