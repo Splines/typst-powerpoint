@@ -1,9 +1,22 @@
+<div align="center">
+  <a href="https://mampf.mathi.uni-heidelberg.de/">
+    <img src="https://github.com/user-attachments/assets/07745d89-fde6-4347-84ba-9a78c164d870"
+      width="130px" alt="PPTypst Logo"/>
+  </a>
+
+  <div align="center">
+    <h3 align="center">PPTypst</h3>
+    <p>
+      <strong>Bring <a href="https://typst.app">Typst</a> to PowerPoint</strong><br>
+      <sub><i>This community project is not affiliated with or endorsed by Typst.</i></sub>
+    </p>
+  </div>
+</div>
+
 > [!Important]
-> This is currently an early preview while the first PoC is being improved on, to then ship the PowerPoint Add-in to the Marketplace.<br>Expect a first release mid/end-February.
+> This is currently an early preview while the first PoC is being improved on, to then ship the PowerPoint Add-in to the Marketplace. Expect a first release mid/end-February.
 
-# 🚀 PPTypst | Typst for PowerPoint
-
-Typst PowerPoint brings the power of [Typst](https://typst.app) to PowerPoint. Easily insert formulas with live preview, update them, and even generate from a file.
+PPTypst brings the power of [Typst](https://typst.app) to PowerPoint. Easily insert formulas with live preview, update them, and even generate from a file.
 
 <https://github.com/user-attachments/assets/3cb307af-4c02-4665-8f2c-34c23c6f68fc>
 
