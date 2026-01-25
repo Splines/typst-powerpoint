@@ -11,7 +11,7 @@ Typst PowerPoint brings the power of [Typst](https://typst.app) to PowerPoint. E
 
 ### ✨ How it works & Developing
 
-See the [Dev Guide](DEV.md) (that is currently outdated).
+See the [Dev Guide](DEV.md).
 
 ### 🎈 About
 
