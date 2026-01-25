@@ -42,7 +42,7 @@ In PowerPoint, press `Ctrl+Shift+I` when the focus is on the Add-in task pane. T
 ### Validate manifest
 
 ```sh
-npm run validate-manifest 
+npm run validate-manifest
 ```
 
 ## Test production-like environment
