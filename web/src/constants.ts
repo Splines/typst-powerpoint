@@ -41,6 +41,11 @@ export const DOM_IDS = {
   FILE_INFO: "fileInfo",
   FILE_NAME: "fileName",
   DROPZONE_LABEL: "dropzoneLabel",
+  STATUS_BAR: "statusBar",
+  THEME_TOGGLE_BTN: "themeToggleBtn",
+  ABOUT_LINK: "aboutLink",
+  ABOUT_MODAL: "aboutModal",
+  ABOUT_MODAL_CLOSE: "aboutModalClose",
 } as const;
 
 /**

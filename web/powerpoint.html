@@ -7,6 +7,7 @@
     <link href="data:image/x-icon;," rel="icon">
     <link href="styles/main.css" rel="stylesheet">
     <link href="styles/file-dropzone.css" rel="stylesheet">
+    <link href="styles/status-bar.css" rel="stylesheet">
     <script src="https://appsforoffice.microsoft.com/lib/1/hosted/office.js"></script>
   </head>
 
@@ -49,14 +50,6 @@
 
     <button id="insertBtn" disabled></button>
     <button id="bulkUpdateBtn" style="display: none;">Update font size</button>
-    <div id="status" class="status"></div>
-
-    <div id="themeToggle">
-      <label>
-        <input id="darkModeToggle" type="checkbox" alt="Toggle dark mode" checked>
-        <span class="slider"></span>
-      </label>
-    </div>
 
     <div class="file-dropzone">
       <div class="dropzone-container">
@@ -74,6 +67,105 @@
         </div>
 
         <button id="generateFromFileBtn" style="display: none;"></button>
+      </div>
+    </div>
+
+    <!-- Status Bar -->
+    <div id="statusBar" class="status-bar">
+      <div id="status" class="status-text"></div>
+      <div class="status-bar-controls">
+        <button id="themeToggleBtn" class="icon-btn" aria-label="Toggle theme" title="Toggle dark/light mode">
+          <svg class="icon-sun" height="18" viewBox="0 0 24 24" width="18">
+            <circle cx="12" cy="12" fill="currentColor" r="5" />
+            <line
+              stroke="currentColor"
+              stroke-width="2"
+              x1="12"
+              x2="12"
+              y1="1"
+              y2="3"
+            />
+            <line
+              stroke="currentColor"
+              stroke-width="2"
+              x1="12"
+              x2="12"
+              y1="21"
+              y2="23"
+            />
+            <line
+              stroke="currentColor"
+              stroke-width="2"
+              x1="4.22"
+              x2="5.64"
+              y1="4.22"
+              y2="5.64"
+            />
+            <line
+              stroke="currentColor"
+              stroke-width="2"
+              x1="18.36"
+              x2="19.78"
+              y1="18.36"
+              y2="19.78"
+            />
+            <line
+              stroke="currentColor"
+              stroke-width="2"
+              x1="1"
+              x2="3"
+              y1="12"
+              y2="12"
+            />
+            <line
+              stroke="currentColor"
+              stroke-width="2"
+              x1="21"
+              x2="23"
+              y1="12"
+              y2="12"
+            />
+            <line
+              stroke="currentColor"
+              stroke-width="2"
+              x1="4.22"
+              x2="5.64"
+              y1="19.78"
+              y2="18.36"
+            />
+            <line
+              stroke="currentColor"
+              stroke-width="2"
+              x1="18.36"
+              x2="19.78"
+              y1="5.64"
+              y2="4.22"
+            />
+          </svg>
+          <svg class="icon-moon" height="18" viewBox="0 0 24 24" width="18">
+            <path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z" fill="currentColor" />
+          </svg>
+        </button>
+        <a id="aboutLink" class="about-link" href="#" title="About">About</a>
+      </div>
+    </div>
+
+    <!-- About Modal -->
+    <div id="aboutModal" class="modal">
+      <div class="modal-content">
+        <span id="aboutModalClose" class="modal-close">&times;</span>
+        <h2>About Typst for PowerPoint</h2>
+        <div class="modal-links">
+          <a href="https://github.com/splines/typst-powerpoint" rel="noopener noreferrer" target="_blank">
+            🌐 Visit Website
+          </a>
+          <a href="https://github.com/splines/typst-powerpoint/issues" rel="noopener noreferrer" target="_blank">
+            🐛 Report a Problem
+          </a>
+          <a href="privacy.html" target="_blank">
+            🔒 Privacy Policy
+          </a>
+        </div>
       </div>
     </div>
 
