@@ -6,8 +6,6 @@
             "ESNext",
             "DOM"
         ],
-        // https://github.com/vitejs/vite/discussions/14950#discussioncomment-7542722
-        "types": ["vite/client"],
         "moduleResolution": "Node",
         "isolatedModules": true,
         "useDefineForClassFields": true,
