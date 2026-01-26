@@ -17,7 +17,7 @@ This is also described in the [Sideload an Office Add-in for testing](https://le
 1. PowerPoint → File → Options → Trust Center → Trust Center Settings → Trusted Add-in Catalogs.
 2. Add a Shared Folder catalog pointing to the folder where `manifest.xml` lives and check "Show in Menu."<br>
 <sub>This step requires the folder to be shared as a network folder, so the Catalog URL should be something like `\\your-device\path\to\repo\`. On Windows, you can share a folder by right-clicking it in File Explorer, selecting "Properties", going to the "Sharing" tab, and clicking "Advanced Sharing..." and "Share this folder". Follow the prompts to share the folder on your network. If you're using WSL, you're lucky since URLs that start with `\\wsl.localhost\` seem to work fine, even without having to configure any network sharing.</sub>
-3. Restart PowerPoint → Home-ribbon → Add-ins → More Add-ins → Shared Folder → pick the Typst Add-in.
+3. Restart PowerPoint → "Home" ribbon → Add-ins → More Add-ins → Shared Folder → pick the PPTypst Add-in.
 
 ### Serve locally
 
