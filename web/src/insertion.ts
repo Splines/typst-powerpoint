@@ -315,12 +315,12 @@ async function calcShapeTopLeftToBeCentered(
   shapeSize: { width: number; height: number },
   context: PowerPoint.RequestContext,
 ) {
-  const presentation = context.presentation;
-  presentation.load("pageSetup/slideWidth, pageSetup/slideHeight");
+  const pageSetup = context.presentation.pageSetup;
+  pageSetup.load(["slideWidth", "slideHeight"]);
   await context.sync();
 
-  const centerX = (presentation.pageSetup.slideWidth - shapeSize.width) / 2;
-  const centerY = (presentation.pageSetup.slideHeight - shapeSize.height) / 2;
+  const centerX = (pageSetup.slideWidth - shapeSize.width) / 2;
+  const centerY = (pageSetup.slideHeight - shapeSize.height) / 2;
 
   return { left: centerX, top: centerY };
 }
