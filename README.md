@@ -22,13 +22,11 @@ Easily insert Typst equations with live preview, update them, and even generate 
 
 <https://github.com/user-attachments/assets/3cb307af-4c02-4665-8f2c-34c23c6f68fc>
 
-<sub>Maybe we can even integrate packages from the [Typst Universe](https://typst.app/universe/) in the future, vote for [this issue](https://github.com/Myriad-Dreamin/typst.ts/issues/825) or provide a PR if you have a solution in mind ;)</sub>
-
 ### Installation
 
 See [the Install guide](./INSTALL.md).
 
-## Tutorial
+### Tutorial
 
 [YouTube: Animate equations in PowerPoint with PPTypst](https://youtu.be/c6sfzu2--iY)
 
