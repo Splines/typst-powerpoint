@@ -8,14 +8,14 @@
 import type * as typstWeb from "@myriaddreamin/typst.ts";
 import { createTypstCompiler, createTypstRenderer } from "@myriaddreamin/typst.ts";
 import {
-  // disableDefaultFontAssets,
+  disableDefaultFontAssets,
   loadFonts,
   withPackageRegistry,
   withAccessModel,
 } from "@myriaddreamin/typst.ts/dist/esm/options.init.mjs";
 import { NodeFetchPackageRegistry } from "@myriaddreamin/typst.ts/dist/esm/fs/package.node.mjs";
 import { MemoryAccessModel } from "@myriaddreamin/typst.ts/dist/esm/fs/memory.mjs";
-import { cachedFontInitOptions } from "./cached-font-middleware";
+import { cachedFontInitOptions } from "./registry/font-cache";
 
 // @ts-expect-error ?url import
 import mathFontUrl from "/math-font.ttf?url";
@@ -71,10 +71,10 @@ async function initCompiler() {
     // eslint-disable-next-line @typescript-eslint/no-unsafe-return
     getModule: () => typstCompilerWasm,
     beforeBuild: [
-      ...cachedFontInitOptions().beforeBuild,
-      // disableDefaultFontAssets(),
+      disableDefaultFontAssets(),
       // eslint-disable-next-line @typescript-eslint/no-unsafe-argument
       loadFonts([mathFontUrl]),
+      ...cachedFontInitOptions().beforeBuild,
       withAccessModel(accessModel),
       withPackageRegistry(
         new NodeFetchPackageRegistry(accessModel, registryRequest),
