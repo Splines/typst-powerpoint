@@ -19,12 +19,20 @@ async function cachedFetch(input: RequestInfo | URL, init?: RequestInit): Promis
     return fetch(request);
   }
 
-  const cache = await caches.open(FONT_CACHE_NAME);
-  const cached = await cache.match(request);
-  if (cached) {
-    return cached;
+  let cache: Cache | null = null;
+  try {
+    cache = await caches.open(FONT_CACHE_NAME);
+    const cached = await cache.match(request);
+    if (cached) {
+      // 🎈 Cached response
+      return cached;
+    }
+  } catch {
+    // No cache access possible
+    return fetch(request);
   }
 
+  // 🎈 No cached response
   const response = await fetch(request);
   if (response.ok) {
     try {
