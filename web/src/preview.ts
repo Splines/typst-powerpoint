@@ -41,7 +41,6 @@ export function setupPreviewListeners() {
   fillColorInput.addEventListener("input", () => {
     const fillColor = getFillColor();
     storeValue(STORAGE_KEYS.FILL_COLOR, fillColor);
-    void updatePreview();
   });
 
   fillColorEnabled.addEventListener("change", () => {
