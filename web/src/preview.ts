@@ -13,9 +13,6 @@ import {
 import { storeValue, getStoredValue } from "./utils/storage.js";
 import { lastTypstShapeId } from "./shape.js";
 
-const PREVIEW_FILL_ENABLED_ID = "previewFillEnabled";
-const PREVIEW_FILL_STORAGE_KEY = "typstPreviewFill";
-
 /**
  * Sets up event listeners for preview updates.
  */
@@ -24,7 +21,7 @@ export function setupPreviewListeners() {
   const fontSizeInput = getInputElement(DOM_IDS.FONT_SIZE);
   const fillColorInput = getInputElement(DOM_IDS.FILL_COLOR);
   const fillColorEnabled = getInputElement(DOM_IDS.FILL_COLOR_ENABLED);
-  const previewFillEnabled = getInputElement(PREVIEW_FILL_ENABLED_ID);
+  const previewFillEnabled = getInputElement(DOM_IDS.PREVIEW_FILL_ENABLED);
   const mathModeEnabled = getInputElement(DOM_IDS.MATH_MODE_ENABLED);
 
   typstInput.addEventListener("input", () => {
@@ -53,7 +50,7 @@ export function setupPreviewListeners() {
   });
 
   previewFillEnabled.addEventListener("change", () => {
-    storeValue(PREVIEW_FILL_STORAGE_KEY, previewFillEnabled.checked.toString());
+    storeValue(STORAGE_KEYS.PREVIEW_FILL, previewFillEnabled.checked.toString());
     void updatePreview();
   });
 
@@ -75,12 +72,12 @@ export function setupPreviewListeners() {
  * Keeps preview fill toggle consistent with Fill checkbox behavior.
  */
 function syncPreviewFillToggleState(isFillEnabled: boolean) {
-  const previewFillEnabled = getInputElement(PREVIEW_FILL_ENABLED_ID);
+  const previewFillEnabled = getInputElement(DOM_IDS.PREVIEW_FILL_ENABLED);
 
   if (isFillEnabled) {
     previewFillEnabled.checked = false;
     previewFillEnabled.disabled = true;
-    storeValue(PREVIEW_FILL_STORAGE_KEY, "false");
+    storeValue(STORAGE_KEYS.PREVIEW_FILL, "false");
     return;
   }
 
@@ -160,7 +157,7 @@ export async function updatePreview() {
 
   const isDarkMode = document.documentElement.classList.contains("dark-mode");
   const previewFill = isDarkMode ? PREVIEW_CONFIG.DARK_MODE_FILL : PREVIEW_CONFIG.LIGHT_MODE_FILL;
-  const shouldKeepTypstFill = getInputElement(PREVIEW_FILL_ENABLED_ID).checked;
+  const shouldKeepTypstFill = getInputElement(DOM_IDS.PREVIEW_FILL_ENABLED).checked;
   if (!shouldKeepTypstFill) {
     applyFillColor(svgElement, previewFill);
   }
