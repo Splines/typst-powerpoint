@@ -85,13 +85,21 @@ function parseHexWithAlpha(value: string): ParsedHexAlpha | null {
   const hex = color.slice(1);
   if (hex.length === 8) {
     const rgbHex = `#${hex.slice(0, 6)}`;
-    const alpha = parseInt(hex.slice(6, 8), 16) / 255;
+    const alphaByte = parseInt(hex.slice(6, 8), 16);
+    if (!Number.isFinite(alphaByte)) {
+      return null;
+    }
+    const alpha = alphaByte / 255;
     return { rgbHex, alpha };
   }
 
   if (hex.length === 4) {
     const rgbHex = `#${hex[0]}${hex[0]}${hex[1]}${hex[1]}${hex[2]}${hex[2]}`;
-    const alpha = parseInt(`${hex[3]}${hex[3]}`, 16) / 255;
+    const alphaByte = parseInt(`${hex[3]}${hex[3]}`, 16);
+    if (!Number.isFinite(alphaByte)) {
+      return null;
+    }
+    const alpha = alphaByte / 255;
     return { rgbHex, alpha };
   }
 
