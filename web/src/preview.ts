@@ -2,7 +2,14 @@ import { DiagnosticMessage, typst } from "./typst.js";
 import { applyFillColor, parseAndApplySize } from "./svg.js";
 import { DOM_IDS, PREVIEW_CONFIG, STORAGE_KEYS, FILL_COLOR_DISABLED } from "./constants.js";
 import { getAreaElement, getHTMLElement, getInputElement } from "./utils/dom";
-import { getFillColor, getFontSize, getMathModeEnabled, getTypstCode, setButtonEnabled, setMathModeEnabled } from "./ui";
+import {
+  getFillColor,
+  getFontSize,
+  getMathModeEnabled,
+  getTypstCode,
+  setButtonEnabled,
+  setMathModeEnabled,
+} from "./ui";
 import { storeValue, getStoredValue } from "./utils/storage.js";
 import { lastTypstShapeId } from "./shape.js";
 
@@ -14,6 +21,7 @@ export function setupPreviewListeners() {
   const fontSizeInput = getInputElement(DOM_IDS.FONT_SIZE);
   const fillColorInput = getInputElement(DOM_IDS.FILL_COLOR);
   const fillColorEnabled = getInputElement(DOM_IDS.FILL_COLOR_ENABLED);
+  const previewFillEnabled = getInputElement(DOM_IDS.PREVIEW_FILL_ENABLED);
   const mathModeEnabled = getInputElement(DOM_IDS.MATH_MODE_ENABLED);
 
   typstInput.addEventListener("input", () => {
@@ -30,14 +38,19 @@ export function setupPreviewListeners() {
   fillColorInput.addEventListener("input", () => {
     const fillColor = getFillColor();
     storeValue(STORAGE_KEYS.FILL_COLOR, fillColor);
-    void updatePreview();
   });
 
   fillColorEnabled.addEventListener("change", () => {
     const fillColor = getFillColor();
     const colorInput = getInputElement(DOM_IDS.FILL_COLOR);
     colorInput.disabled = !fillColorEnabled.checked;
+    syncPreviewFillToggleState(fillColorEnabled.checked);
     storeValue(STORAGE_KEYS.FILL_COLOR, fillColor || FILL_COLOR_DISABLED);
+    void updatePreview();
+  });
+
+  previewFillEnabled.addEventListener("change", () => {
+    storeValue(STORAGE_KEYS.PREVIEW_FILL, previewFillEnabled.checked.toString());
     void updatePreview();
   });
 
@@ -51,7 +64,32 @@ export function setupPreviewListeners() {
     void updatePreview();
   });
 
+  syncPreviewFillToggleState(fillColorEnabled.checked);
   updateMathModeVisuals();
+}
+
+/**
+ * Keeps preview fill toggle consistent with Fill checkbox behavior.
+ */
+function syncPreviewFillToggleState(isFillEnabled: boolean) {
+  const previewFillEnabled = getInputElement(DOM_IDS.PREVIEW_FILL_ENABLED);
+
+  if (isFillEnabled) {
+    previewFillEnabled.checked = false;
+    previewFillEnabled.disabled = true;
+    storeValue(STORAGE_KEYS.PREVIEW_FILL, "false");
+    return;
+  }
+
+  previewFillEnabled.disabled = false;
+}
+
+/**
+ * Syncs preview fill toggle state based on the current fill checkbox value.
+ */
+export function syncPreviewFillToggleFromFillCheckbox() {
+  const fillColorEnabled = getInputElement(DOM_IDS.FILL_COLOR_ENABLED);
+  syncPreviewFillToggleState(fillColorEnabled.checked);
 }
 
 /**
@@ -127,7 +165,10 @@ export async function updatePreview() {
 
   const isDarkMode = document.documentElement.classList.contains("dark-mode");
   const previewFill = isDarkMode ? PREVIEW_CONFIG.DARK_MODE_FILL : PREVIEW_CONFIG.LIGHT_MODE_FILL;
-  applyFillColor(svgElement, previewFill);
+  const shouldKeepTypstFill = getInputElement(DOM_IDS.PREVIEW_FILL_ENABLED).checked;
+  if (!shouldKeepTypstFill) {
+    applyFillColor(svgElement, previewFill);
+  }
 }
 
 /**

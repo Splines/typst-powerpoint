@@ -22,6 +22,11 @@ export function initializeUIState() {
   if (savedMathMode !== null) {
     setMathModeEnabled(savedMathMode === "true");
   }
+
+  const savedPreviewFill = getStoredValue(STORAGE_KEYS.PREVIEW_FILL);
+  if (savedPreviewFill !== null) {
+    setPreviewFillEnabled(savedPreviewFill === "true");
+  }
 }
 
 /**
@@ -84,6 +89,22 @@ export function getFillColor(): string {
 
   const fillColorInput = getInputElement(DOM_IDS.FILL_COLOR);
   return fillColorInput.value || DEFAULTS.FILL_COLOR;
+}
+
+/**
+ * @returns whether preview should keep Typst's own fill colors.
+ */
+export function getPreviewFillEnabled(): boolean {
+  const checkbox = getInputElement(DOM_IDS.PREVIEW_FILL_ENABLED);
+  return checkbox.checked;
+}
+
+/**
+ * Sets whether preview should keep Typst's own fill colors.
+ */
+export function setPreviewFillEnabled(enabled: boolean) {
+  const checkbox = getInputElement(DOM_IDS.PREVIEW_FILL_ENABLED);
+  checkbox.checked = enabled;
 }
 
 /**

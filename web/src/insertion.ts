@@ -1,5 +1,5 @@
 import { debug } from "./utils/logger.js";
-import { applyFillColor, parseAndApplySize } from "./svg.js";
+import { applyFillColor, normalizeAlphaHexColors, parseAndApplySize } from "./svg.js";
 import { typst } from "./typst.js";
 import { setStatus, getFontSize, getFillColor, getMathModeEnabled, getTypstCode } from "./ui.js";
 import { isTypstPayload, createTypstPayload, extractTypstCode } from "./payload.js";
@@ -32,6 +32,7 @@ async function prepareTypstSvg(
   if (fillColor) {
     applyFillColor(svgElement, fillColor);
   }
+  normalizeAlphaHexColors(svgElement);
 
   const serializer = new XMLSerializer();
   const svg = serializer.serializeToString(svgElement);
