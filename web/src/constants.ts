@@ -27,6 +27,7 @@ export const DOM_IDS = {
   FONT_SIZE: "fontSize",
   FILL_COLOR_ENABLED: "fillColorEnabled",
   FILL_COLOR: "fillColor",
+  PREVIEW_FILL_ENABLED: "previewFillEnabled",
   MATH_MODE_ENABLED: "mathModeEnabled",
   INPUT_WRAPPER: "inputWrapper",
   TYPST_INPUT: "typstInput",
@@ -53,6 +54,7 @@ export const DOM_IDS = {
 export const STORAGE_KEYS = {
   FONT_SIZE: "typstFontSize",
   FILL_COLOR: "typstFillColor",
+  PREVIEW_FILL: "typstPreviewFill",
   MATH_MODE: "typstMathMode",
   THEME: "typstTheme",
 } as const;

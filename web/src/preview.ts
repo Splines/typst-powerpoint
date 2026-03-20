@@ -2,9 +2,19 @@ import { DiagnosticMessage, typst } from "./typst.js";
 import { applyFillColor, parseAndApplySize } from "./svg.js";
 import { DOM_IDS, PREVIEW_CONFIG, STORAGE_KEYS, FILL_COLOR_DISABLED } from "./constants.js";
 import { getAreaElement, getHTMLElement, getInputElement } from "./utils/dom";
-import { getFillColor, getFontSize, getMathModeEnabled, getTypstCode, setButtonEnabled, setMathModeEnabled } from "./ui";
+import {
+  getFillColor,
+  getFontSize,
+  getMathModeEnabled,
+  getTypstCode,
+  setButtonEnabled,
+  setMathModeEnabled,
+} from "./ui";
 import { storeValue, getStoredValue } from "./utils/storage.js";
 import { lastTypstShapeId } from "./shape.js";
+
+const PREVIEW_FILL_ENABLED_ID = "previewFillEnabled";
+const PREVIEW_FILL_STORAGE_KEY = "typstPreviewFill";
 
 /**
  * Sets up event listeners for preview updates.
@@ -14,6 +24,7 @@ export function setupPreviewListeners() {
   const fontSizeInput = getInputElement(DOM_IDS.FONT_SIZE);
   const fillColorInput = getInputElement(DOM_IDS.FILL_COLOR);
   const fillColorEnabled = getInputElement(DOM_IDS.FILL_COLOR_ENABLED);
+  const previewFillEnabled = getInputElement(PREVIEW_FILL_ENABLED_ID);
   const mathModeEnabled = getInputElement(DOM_IDS.MATH_MODE_ENABLED);
 
   typstInput.addEventListener("input", () => {
@@ -38,6 +49,11 @@ export function setupPreviewListeners() {
     const colorInput = getInputElement(DOM_IDS.FILL_COLOR);
     colorInput.disabled = !fillColorEnabled.checked;
     storeValue(STORAGE_KEYS.FILL_COLOR, fillColor || FILL_COLOR_DISABLED);
+    void updatePreview();
+  });
+
+  previewFillEnabled.addEventListener("change", () => {
+    storeValue(PREVIEW_FILL_STORAGE_KEY, previewFillEnabled.checked.toString());
     void updatePreview();
   });
 
@@ -127,7 +143,10 @@ export async function updatePreview() {
 
   const isDarkMode = document.documentElement.classList.contains("dark-mode");
   const previewFill = isDarkMode ? PREVIEW_CONFIG.DARK_MODE_FILL : PREVIEW_CONFIG.LIGHT_MODE_FILL;
-  applyFillColor(svgElement, previewFill);
+  const shouldKeepTypstFill = getInputElement(PREVIEW_FILL_ENABLED_ID).checked;
+  if (!shouldKeepTypstFill) {
+    applyFillColor(svgElement, previewFill);
+  }
 }
 
 /**
