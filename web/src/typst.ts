@@ -7,7 +7,15 @@
 
 import type * as typstWeb from "@myriaddreamin/typst.ts";
 import { createTypstCompiler, createTypstRenderer } from "@myriaddreamin/typst.ts";
-import { disableDefaultFontAssets, loadFonts } from "@myriaddreamin/typst.ts/dist/esm/options.init.mjs";
+import {
+  // disableDefaultFontAssets,
+  loadFonts,
+  withPackageRegistry,
+  withAccessModel,
+} from "@myriaddreamin/typst.ts/dist/esm/options.init.mjs";
+import { NodeFetchPackageRegistry } from "@myriaddreamin/typst.ts/dist/esm/fs/package.node.mjs";
+import { MemoryAccessModel } from "@myriaddreamin/typst.ts/dist/esm/fs/memory.mjs";
+import { cachedFontInitOptions } from "./cached-font-middleware";
 
 // @ts-expect-error ?url import
 import mathFontUrl from "/math-font.ttf?url";
@@ -19,6 +27,28 @@ import typstRendererWasm from "@myriaddreamin/typst-ts-renderer/pkg/typst_ts_ren
 
 let compiler: typstWeb.TypstCompiler;
 let renderer: typstWeb.TypstRenderer;
+
+interface RegistryResponse {
+  statusCode: number;
+  getBody: (_encoding?: unknown) => Uint8Array;
+}
+
+function registryRequest(method: string, url: string): RegistryResponse {
+  const request = new XMLHttpRequest();
+  request.open(method, url, false);
+  // Sync XHR from a document cannot use non-text responseType.
+  request.overrideMimeType("text/plain; charset=x-user-defined");
+  request.send();
+
+  const response = request.response as unknown;
+  const responseText = typeof response === "string" ? response : "";
+  const body = Uint8Array.from(responseText, char => char.charCodeAt(0) & 0xff);
+
+  return {
+    statusCode: request.status,
+    getBody: () => body,
+  };
+}
 
 /**
  * Initializes both the Typst compiler and renderer.
@@ -32,16 +62,23 @@ export async function initTypst() {
  * Initializes the Typst compiler.
  *
  * See also https://myriad-dreamin.github.io/typst.ts/cookery/guide/all-in-one.html#label-Initializing%20using%20the%20low-level%20API
+ * And https://github.com/Myriad-Dreamin/typst.ts/blob/2a8b32d8cca70cc4d105fef074d2f35fc7546450/templates/compiler-wasm-cjs/src/main.package.cts#L20-L39
  */
 async function initCompiler() {
   compiler = createTypstCompiler();
+  const accessModel = new MemoryAccessModel();
   await compiler.init({
     // eslint-disable-next-line @typescript-eslint/no-unsafe-return
     getModule: () => typstCompilerWasm,
     beforeBuild: [
-      disableDefaultFontAssets(),
+      ...cachedFontInitOptions().beforeBuild,
+      // disableDefaultFontAssets(),
       // eslint-disable-next-line @typescript-eslint/no-unsafe-argument
       loadFonts([mathFontUrl]),
+      withAccessModel(accessModel),
+      withPackageRegistry(
+        new NodeFetchPackageRegistry(accessModel, registryRequest),
+      ),
     ],
   });
   console.log("Typst compiler initialized");
