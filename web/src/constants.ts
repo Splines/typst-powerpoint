@@ -78,7 +78,7 @@ export const THEMES = {
  * Preview configuration.
  */
 export const PREVIEW_CONFIG = {
-  MAX_HEIGHT: "150px",
+  MAX_HEIGHT: "320px",
   DARK_MODE_FILL: "#ffffff",
   LIGHT_MODE_FILL: "#000000",
 } as const;
