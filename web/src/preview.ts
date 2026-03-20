@@ -48,6 +48,7 @@ export function setupPreviewListeners() {
     const fillColor = getFillColor();
     const colorInput = getInputElement(DOM_IDS.FILL_COLOR);
     colorInput.disabled = !fillColorEnabled.checked;
+    syncPreviewFillToggleState(fillColorEnabled.checked);
     storeValue(STORAGE_KEYS.FILL_COLOR, fillColor || FILL_COLOR_DISABLED);
     void updatePreview();
   });
@@ -67,7 +68,24 @@ export function setupPreviewListeners() {
     void updatePreview();
   });
 
+  syncPreviewFillToggleState(fillColorEnabled.checked);
   updateMathModeVisuals();
+}
+
+/**
+ * Keeps preview fill toggle consistent with Fill checkbox behavior.
+ */
+function syncPreviewFillToggleState(isFillEnabled: boolean) {
+  const previewFillEnabled = getInputElement(PREVIEW_FILL_ENABLED_ID);
+
+  if (isFillEnabled) {
+    previewFillEnabled.checked = false;
+    previewFillEnabled.disabled = true;
+    storeValue(PREVIEW_FILL_STORAGE_KEY, "false");
+    return;
+  }
+
+  previewFillEnabled.disabled = false;
 }
 
 /**
