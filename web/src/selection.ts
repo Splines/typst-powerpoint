@@ -1,6 +1,6 @@
 import { FILL_COLOR_DISABLED, SHAPE_CONFIG, DEFAULTS } from "./constants.js";
 import { extractTypstCode, isTypstPayload } from "./payload.js";
-import { updatePreview, updateButtonState, restoreMathModeFromStorage, updateMathModeVisuals } from "./preview.js";
+import { updatePreview, updateButtonState, restoreMathModeFromStorage, updateMathModeVisuals, syncPreviewFillToggleFromFillCheckbox } from "./preview.js";
 import { readShapeTag, setLastTypstId } from "./shape.js";
 import { setButtonText, setFillColor, setFontSize, setMathModeEnabled, setStatus, setTypstCode, setBulkUpdateButtonVisible, setFileButtonText } from "./ui.js";
 import { debug } from "./utils/logger.js";
@@ -86,6 +86,7 @@ async function loadTypstShape(typstShape: PowerPoint.Shape, slideId: string | nu
     }
 
     setFillColor(fillColorToSet);
+    syncPreviewFillToggleFromFillCheckbox();
     setTypstCode(typstCode);
     setMathModeEnabled(storedMathMode === "true");
     updateMathModeVisuals();

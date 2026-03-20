@@ -85,6 +85,14 @@ function syncPreviewFillToggleState(isFillEnabled: boolean) {
 }
 
 /**
+ * Syncs preview fill toggle state based on the current fill checkbox value.
+ */
+export function syncPreviewFillToggleFromFillCheckbox() {
+  const fillColorEnabled = getInputElement(DOM_IDS.FILL_COLOR_ENABLED);
+  syncPreviewFillToggleState(fillColorEnabled.checked);
+}
+
+/**
  * Restores the math mode setting from localStorage.
  */
 export function restoreMathModeFromStorage() {
