@@ -119,7 +119,7 @@ export function normalizeAlphaHexColors(svg: SVGElement) {
     "stop-color": "stop-opacity",
   };
 
-  const elements = svg.querySelectorAll("*");
+  const elements: Element[] = [svg, ...Array.from(svg.querySelectorAll("*"))];
   elements.forEach((el) => {
     Object.entries(colorToOpacityAttr).forEach(([colorAttr, opacityAttr]) => {
       const value = el.getAttribute(colorAttr);
