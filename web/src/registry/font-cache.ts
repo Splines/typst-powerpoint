@@ -1,8 +1,18 @@
+/**
+ * Module for font downloading and caching in the browser.
+ *
+ * Inspired by the cached font middleware in the typst.ts compiler tempalte:
+ * https://github.com/Myriad-Dreamin/typst.ts/blob/2a8b32d8cca70cc4d105fef074d2f35fc7546450/templates/compiler-wasm-cjs/src/cached-font-middleware.cts#L1-L52
+ */
+
 import { preloadFontAssets } from "@myriaddreamin/typst.ts/dist/esm/options.init.mjs";
 
 const FONT_CACHE_NAME = "typst-font-assets-v1";
 
-const cachedFetch: typeof fetch = async (input: RequestInfo | URL, init?: RequestInit): Promise<Response> => {
+/**
+ * A fetch wrapper that caches font assets in the browser's Cache API.
+ */
+async function cachedFetch(input: RequestInfo | URL, init?: RequestInit): Promise<Response> {
   const request = input instanceof Request ? input : new Request(input, init);
 
   if (!("caches" in globalThis) || request.method.toUpperCase() !== "GET") {
@@ -25,7 +35,7 @@ const cachedFetch: typeof fetch = async (input: RequestInfo | URL, init?: Reques
   }
 
   return response;
-};
+}
 
 export function cachedFontInitOptions() {
   return {
