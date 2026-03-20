@@ -24,31 +24,10 @@ import mathFontUrl from "/math-font.ttf?url";
 import typstCompilerWasm from "@myriaddreamin/typst-ts-web-compiler/pkg/typst_ts_web_compiler_bg.wasm?url";
 // @ts-expect-error WASM module import
 import typstRendererWasm from "@myriaddreamin/typst-ts-renderer/pkg/typst_ts_renderer_bg.wasm?url";
+import { registryRequest } from "./registry/registry";
 
 let compiler: typstWeb.TypstCompiler;
 let renderer: typstWeb.TypstRenderer;
-
-interface RegistryResponse {
-  statusCode: number;
-  getBody: (_encoding?: unknown) => Uint8Array;
-}
-
-function registryRequest(method: string, url: string): RegistryResponse {
-  const request = new XMLHttpRequest();
-  request.open(method, url, false);
-  // Sync XHR from a document cannot use non-text responseType.
-  request.overrideMimeType("text/plain; charset=x-user-defined");
-  request.send();
-
-  const response = request.response as unknown;
-  const responseText = typeof response === "string" ? response : "";
-  const body = Uint8Array.from(responseText, char => char.charCodeAt(0) & 0xff);
-
-  return {
-    statusCode: request.status,
-    getBody: () => body,
-  };
-}
 
 /**
  * Initializes both the Typst compiler and renderer.
