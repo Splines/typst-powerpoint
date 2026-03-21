@@ -7,7 +7,8 @@
   <div align="center">
     <h3 align="center">PPTypst</h3>
     <p>
-      <strong>Bring <a href="https://typst.app">Typst</a> to PowerPoint</strong> | <a href="https://youtu.be/c6sfzu2--iY">YouTube Tutorial</a><br>
+      <strong>Bring <a href="https://typst.app">Typst</a> to PowerPoint</strong> | <a href="https://youtu.be/c6sfzu2--iY">YouTube Tutorial</a>
+      | <a href="https://youtube.com/shorts/O-FMtAGROdA">YouTube Short</a><br>
       <sub><i>This community project is not affiliated with or endorsed by Typst.</i></sub>
     </p>
   </div>
@@ -17,6 +18,8 @@
 > Unfortunately, I cannot publish this Add-in to the PowerPoint Add-in Marketplace due to regulations by Microsoft. See [my comment](https://github.com/Splines/pptypst/issues/4#issuecomment-3909389633). You can still use PPTypst by [manual installation](./INSTALL.md), but unfortunately it's not as easy as one single click.
 
 Easily insert Typst equations with live preview, update them, and even generate from a file.
+
+https://github.com/user-attachments/assets/23e91847-61f8-40a4-a6f2-0bc20b6df504
 
 ![pptypst-preview](https://github.com/user-attachments/assets/be273628-94fe-4117-b0dd-4d0e87f47d52)
 
