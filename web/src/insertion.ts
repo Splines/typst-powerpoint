@@ -13,6 +13,11 @@ type PreparedSvgResult = {
   payload: string;
 };
 
+type SlideSize = {
+  width: number;
+  height: number;
+};
+
 /**
  * Compiles Typst code to SVG and prepares it for insertion.
  */
@@ -98,11 +103,20 @@ export async function insertOrUpdateFormula() {
       const selection = context.presentation.getSelectedShapes();
       const selectedSlides = context.presentation.getSelectedSlides();
       const allSlides = context.presentation.slides;
+      const pageSetup = context.presentation.pageSetup;
 
       selection.load("items");
       selectedSlides.load("items");
       allSlides.load("items");
+      pageSetup.load(["slideWidth", "slideHeight"]);
       await context.sync();
+
+      const slideSize: SlideSize = {
+        width: pageSetup.slideWidth,
+        height: pageSetup.slideHeight,
+      };
+
+      const fittedSize = fitSizeWithinSlide(prepared.size, slideSize);
 
       const targetSlide: PowerPoint.Slide | undefined = selectedSlides.items[0] || allSlides.items[0];
       // eslint-disable-next-line @typescript-eslint/no-unnecessary-condition
@@ -119,13 +133,14 @@ export async function insertOrUpdateFormula() {
 
       const typstShape = await findTypstShape(selection.items, allSlides.items, context);
       if (typstShape) {
-        position = calculateCenteredPosition(typstShape, prepared.size);
+        position = calculateCenteredPosition(typstShape, fittedSize);
+        position = clampPositionWithinSlide(position, fittedSize, slideSize);
         rotation = typstShape.rotation;
         typstShape.delete();
         isReplacing = true;
         await context.sync();
       } else {
-        position = await calcShapeTopLeftToBeCentered(prepared.size, context);
+        position = calcShapeTopLeftToBeCentered(fittedSize, slideSize);
       }
 
       const existingShapeIds = new Set(targetSlide.shapes.items.map(shape => shape.id));
@@ -135,7 +150,7 @@ export async function insertOrUpdateFormula() {
         fillColor: fillColor || null,
         mathMode,
         position,
-        size: prepared.size,
+        size: fittedSize,
         rotation,
       }, targetSlide.id, existingShapeIds);
 
@@ -254,7 +269,21 @@ export async function bulkUpdateFontSize() {
             continue;
           }
 
-          const position = calculateCenteredPosition(shape, prepared.size);
+          const pageSetup = context.presentation.pageSetup;
+          pageSetup.load(["slideWidth", "slideHeight"]);
+          await context.sync();
+          const slideSize: SlideSize = {
+            width: pageSetup.slideWidth,
+            height: pageSetup.slideHeight,
+          };
+
+          const fittedSize = fitSizeWithinSlide(prepared.size, slideSize);
+          let position = calculateCenteredPosition(shape, fittedSize);
+          position = clampPositionWithinSlide(
+            position,
+            fittedSize,
+            slideSize,
+          );
           const rotation = shape.rotation;
 
           // Capture slide and existing shapes before deletion
@@ -274,7 +303,7 @@ export async function bulkUpdateFontSize() {
             fillColor,
             mathMode,
             position,
-            size: prepared.size,
+            size: fittedSize,
             rotation,
           }, slideId, existingShapeIds);
 
@@ -310,18 +339,59 @@ function calculateCenteredPosition(
 }
 
 /**
+ * Scales a shape to fit the slide while preserving aspect ratio.
+ *
+ * The scale factor is computed as:
+ * s = min(slideWidth / shapeWidth, slideHeight / shapeHeight, 1)
+ */
+function fitSizeWithinSlide(
+  shapeSize: { width: number; height: number },
+  slideSize: SlideSize,
+): { width: number; height: number } {
+  if (shapeSize.width <= 0 || shapeSize.height <= 0) {
+    return shapeSize;
+  }
+
+  const widthScale = slideSize.width / shapeSize.width;
+  const heightScale = slideSize.height / shapeSize.height;
+  const scale = Math.min(widthScale, heightScale, 1);
+
+  return {
+    width: shapeSize.width * scale,
+    height: shapeSize.height * scale,
+  };
+}
+
+/**
+ * Clamps a position so the full shape remains inside the slide.
+ *
+ * The placement is clamped to:
+ * - left: [0, slideWidth - shapeWidth]
+ * - top: [0, slideHeight - shapeHeight]
+ */
+function clampPositionWithinSlide(
+  position: { left: number; top: number },
+  shapeSize: { width: number; height: number },
+  slideSize: SlideSize,
+): { left: number; top: number } {
+  const maxLeft = Math.max(0, slideSize.width - shapeSize.width);
+  const maxTop = Math.max(0, slideSize.height - shapeSize.height);
+
+  return {
+    left: Math.min(Math.max(0, position.left), maxLeft),
+    top: Math.min(Math.max(0, position.top), maxTop),
+  };
+}
+
+/**
  * Calculates the top-left position for a shape to be centered on the slide.
  */
-async function calcShapeTopLeftToBeCentered(
+function calcShapeTopLeftToBeCentered(
   shapeSize: { width: number; height: number },
-  context: PowerPoint.RequestContext,
+  slideSize: SlideSize,
 ) {
-  const pageSetup = context.presentation.pageSetup;
-  pageSetup.load(["slideWidth", "slideHeight"]);
-  await context.sync();
+  const centerX = (slideSize.width - shapeSize.width) / 2;
+  const centerY = (slideSize.height - shapeSize.height) / 2;
 
-  const centerX = (pageSetup.slideWidth - shapeSize.width) / 2;
-  const centerY = (pageSetup.slideHeight - shapeSize.height) / 2;
-
-  return { left: centerX, top: centerY };
+  return clampPositionWithinSlide({ left: centerX, top: centerY }, shapeSize, slideSize);
 }
