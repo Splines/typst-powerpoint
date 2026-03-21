@@ -47,6 +47,17 @@ In PowerPoint, press `Ctrl+Shift+I` when the focus is on the Add-in task pane. T
 npm run validate-manifest
 ```
 
+## Playwright Tests
+
+```sh
+# Install necessary dependencies first
+npx playwright install-deps chromium
+npx playwright install chromium
+
+# Run tests
+npm run test # or even easier, just use the Playwright VSCode extension
+```
+
 ## Test production-like environment
 
 All you have to do is sideload the `manifest.prod.xml` instead of the manifest used for local development `manifest.xml`. To do so, copy the `manifest.prod.xml` to some `tmp/` folder that you have added to the PowerPoint Trust Center (see above) and rename the file to `manifest.xml` such that PowerPoint recognizes it.

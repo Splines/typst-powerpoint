@@ -7,6 +7,7 @@
     "build": "vite build --config .config/vite.config.js",
     "start": "office-addin-debugging start manifest.xml desktop",
     "stop": "office-addin-debugging stop manifest.xml",
+    "test": "npx playwright test",
     "validate": "office-addin-manifest validate manifest.xml",
     "validate-prod": "office-addin-manifest validate -p manifest.prod.xml",
     "generate-prod-manifest": "sed 's|https://localhost:3155/pptypst/|https://splines.github.io/pptypst/|g' manifest.xml > manifest.prod.xml"
@@ -14,7 +15,9 @@
   "devDependencies": {
     "@eslint/css": "^0.14.1",
     "@html-eslint/eslint-plugin": "^0.52.1",
+    "@playwright/test": "^1.58.2",
     "@stylistic/eslint-plugin": "^5.7.0",
+    "@types/node": "^25.5.0",
     "@types/office-js": "^1.0.568",
     "eslint": "^9.39.2",
     "globals": "^17.0.0",
