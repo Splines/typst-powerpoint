@@ -54,8 +54,11 @@ npm run validate-manifest
 npx playwright install-deps chromium
 npx playwright install chromium
 
-# Run tests
-npm run test # or even easier, just use the Playwright VSCode extension
+# Start the webserver
+npm run dev
+
+# Run tests (or even easier, just use the Playwright VSCode extension)
+npm run test
 ```
 
 ## Test production-like environment
