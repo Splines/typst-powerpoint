@@ -251,6 +251,14 @@ export async function bulkUpdateFontSize() {
         return;
       }
 
+      const pageSetup = context.presentation.pageSetup;
+      pageSetup.load(["slideWidth", "slideHeight"]);
+      await context.sync();
+      const slideSize: SlideSize = {
+        width: pageSetup.slideWidth,
+        height: pageSetup.slideHeight,
+      };
+
       let successCount = 0;
 
       for (const shape of typstShapes) {
@@ -268,14 +276,6 @@ export async function bulkUpdateFontSize() {
             debug(`Typst compile failed for shape ${shape.id}`);
             continue;
           }
-
-          const pageSetup = context.presentation.pageSetup;
-          pageSetup.load(["slideWidth", "slideHeight"]);
-          await context.sync();
-          const slideSize: SlideSize = {
-            width: pageSetup.slideWidth,
-            height: pageSetup.slideHeight,
-          };
 
           const fittedSize = fitSizeWithinSlide(prepared.size, slideSize);
           let position = calculateCenteredPosition(shape, fittedSize);
