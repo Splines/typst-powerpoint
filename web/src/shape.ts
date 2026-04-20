@@ -35,8 +35,11 @@ export type TypstShapeInfo = {
 /**
  * Writes shape properties and Typst metadata to a given shape.
  */
-export async function writeShapeProperties(shape: PowerPoint.Shape, info: TypstShapeInfo,
-  context: PowerPoint.RequestContext) {
+export async function writeShapeProperties(
+  shape: PowerPoint.Shape,
+  info: TypstShapeInfo,
+  context: PowerPoint.RequestContext,
+) {
   shape.altTextTitle = SHAPE_CONFIG.ALT_TEXT_TITLE;
   shape.altTextDescription = SHAPE_CONFIG.ALT_TEXT_DESCRIPTION;
   shape.name = SHAPE_CONFIG.NAME;
@@ -45,7 +48,24 @@ export async function writeShapeProperties(shape: PowerPoint.Shape, info: TypstS
   shape.tags.add(SHAPE_CONFIG.TAGS.FILL_COLOR,
     info.fillColor === null ? FILL_COLOR_DISABLED : info.fillColor);
   shape.tags.add(SHAPE_CONFIG.TAGS.MATH_MODE, info.mathMode.toString());
-  shape.customXmlParts.add(serializeTypstSource(info.source));
+
+  const serializedSource = serializeTypstSource(info.source);
+  const existingTypstParts = shape.customXmlParts.getByNamespace(
+    SHAPE_CONFIG.CUSTOM_XML.NAMESPACE,
+  );
+  existingTypstParts.load("items/id");
+  await context.sync();
+
+  if (existingTypstParts.items.length > 0) {
+    const currentPart = existingTypstParts.items[existingTypstParts.items.length - 1];
+    currentPart.setXml(serializedSource);
+
+    for (const stalePart of existingTypstParts.items.slice(0, -1)) {
+      stalePart.delete();
+    }
+  } else {
+    shape.customXmlParts.add(serializedSource);
+  }
 
   if (info.size.height > 0 && info.size.width > 0) {
     shape.height = info.size.height;
