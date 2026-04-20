@@ -71,14 +71,17 @@ export function parseTypstSource(xml: string): TypstSource | null {
     return null;
   }
 
-  const preambleNode = documentNode.getElementsByTagNameNS(
-    SHAPE_CONFIG.CUSTOM_XML.NAMESPACE,
-    "preamble",
-  )[0];
-  const bodyNode = documentNode.getElementsByTagNameNS(
-    SHAPE_CONFIG.CUSTOM_XML.NAMESPACE,
-    "body",
-  )[0];
+  const preambleNode = documentNode
+    .getElementsByTagNameNS(SHAPE_CONFIG.CUSTOM_XML.NAMESPACE, "preamble")
+    .item(0);
+
+  const bodyNode = documentNode
+    .getElementsByTagNameNS(SHAPE_CONFIG.CUSTOM_XML.NAMESPACE, "body")
+    .item(0);
+
+  if (preambleNode === null || bodyNode === null) {
+    return null;
+  }
 
   return {
     preamble: preambleNode.textContent,
