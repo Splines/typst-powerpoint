@@ -1,12 +1,15 @@
 {
     "compilerOptions": {
-        "target": "es2022",
-        "module": "es2022",
+        "target": "es6",
+        "module": "es6",
         "lib": [
             "ESNext",
             "DOM"
         ],
-        "moduleResolution": "Node",
+        "moduleResolution": "bundler",
+        "types": [
+            "office-js"
+        ],
         "isolatedModules": true,
         "useDefineForClassFields": true,
         "strict": true,
@@ -21,7 +24,6 @@
         "checkJs": true,
     },
     "include": [
-        "web/src/**/*.d.ts",
         "web/src/**/*.ts",
         "web/src/**/*.js",
     ],
