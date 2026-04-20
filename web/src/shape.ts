@@ -49,23 +49,10 @@ export async function writeShapeProperties(
     info.fillColor === null ? FILL_COLOR_DISABLED : info.fillColor);
   shape.tags.add(SHAPE_CONFIG.TAGS.MATH_MODE, info.mathMode.toString());
 
+  // There can't be leftover XML parts here, as we always create
+  // a new shape when updating
   const serializedSource = serializeTypstSource(info.source);
-  const existingTypstParts = shape.customXmlParts.getByNamespace(
-    SHAPE_CONFIG.CUSTOM_XML.NAMESPACE,
-  );
-  existingTypstParts.load("items/id");
-  await context.sync();
-
-  if (existingTypstParts.items.length > 0) {
-    const currentPart = existingTypstParts.items[existingTypstParts.items.length - 1];
-    currentPart.setXml(serializedSource);
-
-    for (const stalePart of existingTypstParts.items.slice(0, -1)) {
-      stalePart.delete();
-    }
-  } else {
-    shape.customXmlParts.add(serializedSource);
-  }
+  shape.customXmlParts.add(serializedSource);
 
   if (info.size.height > 0 && info.size.width > 0) {
     shape.height = info.size.height;
